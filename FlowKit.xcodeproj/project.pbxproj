@@ -9,7 +9,11 @@
 /* Begin PBXBuildFile section */
 		85C5CB841D15BFBD00FF5367 /* FlowKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 85C5CB831D15BFBD00FF5367 /* FlowKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85C5CB8B1D15BFBD00FF5367 /* FlowKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CB801D15BFBD00FF5367 /* FlowKit.framework */; };
-		85C5CB901D15BFBD00FF5367 /* FlowKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5CB8F1D15BFBD00FF5367 /* FlowKitTests.swift */; };
+		85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5CB8F1D15BFBD00FF5367 /* SampleTests.swift */; };
+		85C5CB9B1D15C10600FF5367 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5CB9A1D15C10600FF5367 /* Sample.swift */; };
+		85C5CBA31D15C4CC00FF5367 /* Example.fcs in Resources */ = {isa = PBXBuildFile; fileRef = 85C5CBA21D15C4CC00FF5367 /* Example.fcs */; };
+		85C5CBA61D15C56D00FF5367 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CBA51D15C56D00FF5367 /* Metal.framework */; };
+		85C5CBA81D15C57200FF5367 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CBA71D15C57200FF5367 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,8 +31,12 @@
 		85C5CB831D15BFBD00FF5367 /* FlowKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlowKit.h; sourceTree = "<group>"; };
 		85C5CB851D15BFBD00FF5367 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		85C5CB8A1D15BFBD00FF5367 /* FlowKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		85C5CB8F1D15BFBD00FF5367 /* FlowKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowKitTests.swift; sourceTree = "<group>"; };
+		85C5CB8F1D15BFBD00FF5367 /* SampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleTests.swift; sourceTree = "<group>"; };
 		85C5CB911D15BFBD00FF5367 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		85C5CB9A1D15C10600FF5367 /* Sample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
+		85C5CBA21D15C4CC00FF5367 /* Example.fcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Example.fcs; sourceTree = "<group>"; };
+		85C5CBA51D15C56D00FF5367 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		85C5CBA71D15C57200FF5367 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +44,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85C5CBA81D15C57200FF5367 /* Accelerate.framework in Frameworks */,
+				85C5CBA61D15C56D00FF5367 /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,6 +63,7 @@
 		85C5CB761D15BFBD00FF5367 = {
 			isa = PBXGroup;
 			children = (
+				85C5CBA41D15C56C00FF5367 /* Frameworks */,
 				85C5CB821D15BFBD00FF5367 /* Source */,
 				85C5CB8E1D15BFBD00FF5367 /* Tests */,
 				85C5CB811D15BFBD00FF5367 /* Products */,
@@ -73,6 +84,7 @@
 			children = (
 				85C5CB831D15BFBD00FF5367 /* FlowKit.h */,
 				85C5CB851D15BFBD00FF5367 /* Info.plist */,
+				85C5CB9A1D15C10600FF5367 /* Sample.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -80,10 +92,28 @@
 		85C5CB8E1D15BFBD00FF5367 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				85C5CB8F1D15BFBD00FF5367 /* FlowKitTests.swift */,
+				85C5CBA11D15C4CC00FF5367 /* Resources */,
 				85C5CB911D15BFBD00FF5367 /* Info.plist */,
+				85C5CB8F1D15BFBD00FF5367 /* SampleTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		85C5CBA11D15C4CC00FF5367 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				85C5CBA21D15C4CC00FF5367 /* Example.fcs */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		85C5CBA41D15C56C00FF5367 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				85C5CBA71D15C57200FF5367 /* Accelerate.framework */,
+				85C5CBA51D15C56D00FF5367 /* Metal.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -150,6 +180,7 @@
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = FRC6CVKX9G;
 						DevelopmentTeamName = "Chiping Wu (Personal Team)";
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 					85C5CB891D15BFBD00FF5367 = {
@@ -190,6 +221,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85C5CBA31D15C4CC00FF5367 /* Example.fcs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85C5CB9B1D15C10600FF5367 /* Sample.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				85C5CB901D15BFBD00FF5367 /* FlowKitTests.swift in Sources */,
+				85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,6 +350,7 @@
 		85C5CB951D15BFBD00FF5367 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -329,6 +363,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = ca.diploid.FlowKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -336,6 +371,7 @@
 		85C5CB961D15BFBD00FF5367 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
