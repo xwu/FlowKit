@@ -53,8 +53,8 @@
 		85C5CB761D15BFBD00FF5367 = {
 			isa = PBXGroup;
 			children = (
-				85C5CB821D15BFBD00FF5367 /* FlowKit */,
-				85C5CB8E1D15BFBD00FF5367 /* FlowKitTests */,
+				85C5CB821D15BFBD00FF5367 /* Source */,
+				85C5CB8E1D15BFBD00FF5367 /* Tests */,
 				85C5CB811D15BFBD00FF5367 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -68,21 +68,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		85C5CB821D15BFBD00FF5367 /* FlowKit */ = {
+		85C5CB821D15BFBD00FF5367 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				85C5CB831D15BFBD00FF5367 /* FlowKit.h */,
 				85C5CB851D15BFBD00FF5367 /* Info.plist */,
 			);
+			name = Source;
 			path = FlowKit;
 			sourceTree = "<group>";
 		};
-		85C5CB8E1D15BFBD00FF5367 /* FlowKitTests */ = {
+		85C5CB8E1D15BFBD00FF5367 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				85C5CB8F1D15BFBD00FF5367 /* FlowKitTests.swift */,
 				85C5CB911D15BFBD00FF5367 /* Info.plist */,
 			);
+			name = Tests;
 			path = FlowKitTests;
 			sourceTree = "<group>";
 		};
