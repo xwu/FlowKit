@@ -70,8 +70,6 @@ public final class Sample {
   public let parameters: [String]
   public let count: Int
   internal let _rawEvents: [Float]
-  //TODO: public internal(set) var compensation: Compensation
-  //TODO: public internal(set) var transforms: [String : Transform] = [:]
   public internal(set) var events: [String : [Float]] = [:]
 
   public init?(
@@ -334,8 +332,8 @@ public final class Sample {
     self.header = header
     self.keywords = keywords
     self.parameters = parameters
-    count = tot
-    _rawEvents = events
+    self.count = tot
+    self._rawEvents = events
 
     //TODO: Parse acquisition compensation matrix
     //      and compensate before populating `events`

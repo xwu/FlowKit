@@ -14,6 +14,7 @@
 		85C5CBA31D15C4CC00FF5367 /* Example.fcs in Resources */ = {isa = PBXBuildFile; fileRef = 85C5CBA21D15C4CC00FF5367 /* Example.fcs */; };
 		85C5CBA61D15C56D00FF5367 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CBA51D15C56D00FF5367 /* Metal.framework */; };
 		85C5CBA81D15C57200FF5367 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CBA71D15C57200FF5367 /* Accelerate.framework */; };
+		85DF309F1D15FE03001E846B /* Compensation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DF309E1D15FE03001E846B /* Compensation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		85C5CBA21D15C4CC00FF5367 /* Example.fcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Example.fcs; sourceTree = "<group>"; };
 		85C5CBA51D15C56D00FF5367 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		85C5CBA71D15C57200FF5367 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		85DF309E1D15FE03001E846B /* Compensation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Compensation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 				85C5CB831D15BFBD00FF5367 /* FlowKit.h */,
 				85C5CB851D15BFBD00FF5367 /* Info.plist */,
 				85C5CB9A1D15C10600FF5367 /* Sample.swift */,
+				85DF309E1D15FE03001E846B /* Compensation.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -233,6 +236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				85C5CB9B1D15C10600FF5367 /* Sample.swift in Sources */,
+				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +435,7 @@
 				85C5CB961D15BFBD00FF5367 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		85C5CB971D15BFBD00FF5367 /* Build configuration list for PBXNativeTarget "FlowKitTests" */ = {
 			isa = XCConfigurationList;
@@ -439,6 +444,7 @@
 				85C5CB991D15BFBD00FF5367 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
