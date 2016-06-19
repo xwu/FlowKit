@@ -82,7 +82,7 @@ public struct Compensation {
         result[newRow * p + newColumn] = v
       }
     } else {
-      //TODO: implement support for overdetermined systems
+      //TODO: Implement support for overdetermined systems
       return nil
     }
     return (parameters, result)
@@ -112,7 +112,7 @@ public struct Compensation {
         )
       }
     } else if parameters.count != sample.parameters.count {
-      //TODO: implement support for overdetermined systems
+      //TODO: Implement support for overdetermined systems
       return
     } else {
       // We need to solve for b:

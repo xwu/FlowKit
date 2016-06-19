@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		855AE2101D1737C000A87EE1 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE20F1D1737C000A87EE1 /* Transform.swift */; };
+		855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2111D174AFC00A87EE1 /* LinearTransform.swift */; };
+		855AE2141D17509D00A87EE1 /* LogTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2131D17509D00A87EE1 /* LogTransform.swift */; };
+		855AE2161D1755F100A87EE1 /* AsinhTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2151D1755F100A87EE1 /* AsinhTransform.swift */; };
 		85C5CB841D15BFBD00FF5367 /* FlowKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 85C5CB831D15BFBD00FF5367 /* FlowKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85C5CB8B1D15BFBD00FF5367 /* FlowKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CB801D15BFBD00FF5367 /* FlowKit.framework */; };
 		85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5CB8F1D15BFBD00FF5367 /* SampleTests.swift */; };
@@ -29,6 +33,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		855AE20F1D1737C000A87EE1 /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transform.swift; sourceTree = "<group>"; };
+		855AE2111D174AFC00A87EE1 /* LinearTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearTransform.swift; sourceTree = "<group>"; };
+		855AE2131D17509D00A87EE1 /* LogTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogTransform.swift; sourceTree = "<group>"; };
+		855AE2151D1755F100A87EE1 /* AsinhTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsinhTransform.swift; sourceTree = "<group>"; };
 		85C5CB801D15BFBD00FF5367 /* FlowKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FlowKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		85C5CB831D15BFBD00FF5367 /* FlowKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlowKit.h; sourceTree = "<group>"; };
 		85C5CB851D15BFBD00FF5367 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -90,6 +98,10 @@
 				85C5CB851D15BFBD00FF5367 /* Info.plist */,
 				85C5CB9A1D15C10600FF5367 /* Sample.swift */,
 				85DF309E1D15FE03001E846B /* Compensation.swift */,
+				855AE20F1D1737C000A87EE1 /* Transform.swift */,
+				855AE2111D174AFC00A87EE1 /* LinearTransform.swift */,
+				855AE2131D17509D00A87EE1 /* LogTransform.swift */,
+				855AE2151D1755F100A87EE1 /* AsinhTransform.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -238,8 +250,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				855AE2161D1755F100A87EE1 /* AsinhTransform.swift in Sources */,
 				85C5CB9B1D15C10600FF5367 /* Sample.swift in Sources */,
+				855AE2101D1737C000A87EE1 /* Transform.swift in Sources */,
 				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
+				855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */,
+				855AE2141D17509D00A87EE1 /* LogTransform.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

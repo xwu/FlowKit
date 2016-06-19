@@ -346,7 +346,9 @@ public final class Sample {
     self._rawEvents = rawEvents
     self.count = count
 
-    //TODO: Parse acquisition compensation matrix
-    //      and compensate before populating `events`
+    // If possible, compensate using acquisition matrix
+    if let compensation = Compensation(self) {
+      compensation.unmix(self)
+    }
   }
 }
