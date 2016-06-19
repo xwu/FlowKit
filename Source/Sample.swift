@@ -68,9 +68,18 @@ public final class Sample {
   public let header: [String]
   public let keywords: [String : String]
   public let parameters: [String]
-  public let count: Int
   internal let _rawEvents: [Float]
+  public let count: Int
   public internal(set) var events: [String : [Float]] = [:]
+
+  public init(_ sample: Sample) {
+    header = sample.header
+    keywords = sample.keywords
+    parameters = sample.parameters
+    _rawEvents = sample._rawEvents
+    count = sample.count
+    events = sample.events
+  }
 
   public init?(
     _ data: Data, offset: Int = 0, options: ReadingOptions = .transform
@@ -137,7 +146,6 @@ public final class Sample {
     guard
       let t = keywords["$TOT"], tot = Int(t) where tot > 0
       else { return nil }
-    //FIXME: Ensure that `count` reflects the number of events actually parsed
 
     // Determine byte order
     guard let bo = keywords["$BYTEORD"] else { return nil }
@@ -158,7 +166,7 @@ public final class Sample {
 
     // Parse events; for consistency, store processed event data as [Float]
     // regardless of input data type
-    var events: [Float]
+    var rawEvents: [Float]
     do {
       guard
         let mode = keywords["$MODE"]?.uppercased() where mode == "L"
@@ -191,32 +199,32 @@ public final class Sample {
       switch dataType {
       case "D":
         let size = strideof(Double)
-        events = [Float](repeating: Float.nan, count: subdata.count / size)
+        rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
         if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
-            events[i / size] = Float(NSSwapBigDoubleToHost(
+            rawEvents[i / size] = Float(NSSwapBigDoubleToHost(
               NSSwappedDouble(v: subdata.unsafeValue(at: i))
             ))
           }
         } else {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
-            events[i / size] = Float(NSSwapLittleDoubleToHost(
+            rawEvents[i / size] = Float(NSSwapLittleDoubleToHost(
               NSSwappedDouble(v: subdata.unsafeValue(at: i))
             ))
           }
         }
       case "F":
         let size = strideof(Float)
-        events = [Float](repeating: Float.nan, count: subdata.count / size)
+        rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
         if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
-            events[i / size] = NSSwapBigFloatToHost(
+            rawEvents[i / size] = NSSwapBigFloatToHost(
               NSSwappedFloat(v: subdata.unsafeValue(at: i))
             )
           }
         } else {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
-            events[i / size] = NSSwapLittleFloatToHost(
+            rawEvents[i / size] = NSSwapLittleFloatToHost(
               NSSwappedFloat(v: subdata.unsafeValue(at: i))
             )
           }
@@ -282,7 +290,7 @@ public final class Sample {
 
         // `positions.last` and `bytelengths.last` should never be nil
         let bytesPerEvent = positions.last! + bytelengths.last!
-        events = [Float](
+        rawEvents = [Float](
           repeating: Float.nan, count: subdata.count / bytesPerEvent * par
         )
         for i in stride(
@@ -318,7 +326,7 @@ public final class Sample {
               floatValue /= scales[j]
             }
             let index = i / bytesPerEvent * par + j
-            events[index] = floatValue
+            rawEvents[index] = floatValue
           }
         }
       case "A":
@@ -329,11 +337,14 @@ public final class Sample {
       }
     }
 
+    let count = rawEvents.count / parameters.count
+    //TODO: Log warning if `count != tot`
+
     self.header = header
     self.keywords = keywords
     self.parameters = parameters
-    self.count = tot
-    self._rawEvents = events
+    self._rawEvents = rawEvents
+    self.count = count
 
     //TODO: Parse acquisition compensation matrix
     //      and compensate before populating `events`
