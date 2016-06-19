@@ -15,19 +15,6 @@ public struct Compensation {
   public let matrix: [Float] /* row-major */
   public let isInverted: Bool
 
-  public init(
-    detectors: [String], fluorochromes: [String]? = nil,
-    matrix: [Float], isInverted: Bool = false
-  ) {
-    let d = detectors.count, f = (fluorochromes ?? detectors).count
-    precondition(d >= f && matrix.count == d * f)
-
-    self.detectors = detectors
-    self.fluorochromes = fluorochromes
-    self.matrix = matrix
-    self.isInverted = isInverted
-  }
-
   public init?(_ sample: Sample) {
     let keys = ["$SPILLOVER", "SPILL", "$COMP", "SPILLOVER", "$SPILL", "COMP"]
     var strings = [String]()
@@ -51,6 +38,19 @@ public struct Compensation {
     self.init(detectors: detectors, matrix: matrix)
   }
 
+  public init(
+    detectors: [String], fluorochromes: [String]? = nil,
+    matrix: [Float], isInverted: Bool = false
+  ) {
+    let d = detectors.count, f = (fluorochromes ?? detectors).count
+    precondition(d >= f && matrix.count == d * f)
+
+    self.detectors = detectors
+    self.fluorochromes = fluorochromes
+    self.matrix = matrix
+    self.isInverted = isInverted
+  }
+
   internal func _unscramble(for sample: Sample) -> ([String], [Float])? {
     let d = detectors.count
     let f = (fluorochromes ?? detectors).count
@@ -58,8 +58,6 @@ public struct Compensation {
     let map = detectors.map { sample.parameters.index(of: $0) }.flatMap { $0 }
     // We cannot proceed if any detector is not found in the sample's parameters
     guard d == map.count else { return nil }
-    //TODO: implement support for overdetermined systems
-    guard d == f else { return nil }
 
     // Set up an identity matrix
     var result = [Float](repeating: 0, count: p * p)
@@ -68,8 +66,12 @@ public struct Compensation {
     }
 
     //TODO: ensure that the following is correct even if the matrix is inverted
-    //...
-
+    if d == f {
+      // ...
+    } else {
+      //TODO: implement support for overdetermined systems
+      return nil
+    }
     return (sample.parameters, result)
   }
 
