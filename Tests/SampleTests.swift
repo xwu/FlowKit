@@ -23,7 +23,7 @@ class SampleTests : XCTestCase {
     super.tearDown()
   }
 */
-  func testExample() {
+  func testSample() {
     let testBundle = Bundle(for: SampleTests.self)
     let url = testBundle.urlForResource("Example", withExtension: "fcs")
     let data = try! Data(contentsOf: url!)

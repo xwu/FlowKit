@@ -59,26 +59,36 @@ public struct Compensation {
     // We cannot proceed if any detector is not found in the sample's parameters
     guard d == map.count else { return nil }
 
-    // Set up an identity matrix
+    // Make a copy of `sample.parameters`, to be modified by substituting
+    // fluorochrome names (if any) for detector names
+    var parameters = sample.parameters
+    // Set up an identity matrix so that parameters not being unmixed are
+    // preserved after compensation is applied
     var result = [Float](repeating: 0, count: p * p)
-    for i in 0..<d {
-      result[i * (d + 1)] = 1
+    for i in 0..<p {
+      result[i * (p + 1)] = 1
     }
-
-    //TODO: ensure that the following is correct even if the matrix is inverted
     if d == f {
-      // ...
+      if let fluorochromes = fluorochromes {
+        for (i, j) in map.enumerated() {
+          parameters[j] = fluorochromes[i]
+        }
+      }
+      // Our task is greatly simplified when `d == f`
+      // The following is correct whether or not `isInverted == true`
+      for (i, v) in matrix.enumerated() {
+        let oldRow = i / d, oldColumn = i % d
+        let newRow = map[oldRow], newColumn = map[oldColumn]
+        result[newRow * p + newColumn] = v
+      }
     } else {
       //TODO: implement support for overdetermined systems
       return nil
     }
-    return (sample.parameters, result)
+    return (parameters, result)
   }
 
   public func unmix(_ sample: Sample) {
-    // If unmixing fails, `sample.events` will be empty
-    sample.events.removeAll()
-
     guard let (parameters, matrix) = _unscramble(for: sample) else { return }
     var result: [Float]
 
@@ -130,8 +140,13 @@ public struct Compensation {
       guard info == 0 else { return }
     }
 
-    // Populate `sample.events`
+    // Populate `sample.events` with any new dimensions generated and replace
+    // any existing dimensions that may have been modified by unmixing
+    let s = Set(parameters)
+      .subtracting(Set(sample.events.keys))
+      .union(Set(fluorochromes ?? detectors))
     for (i, p) in parameters.enumerated() {
+      guard s.contains(p) else { continue }
       sample.events[p] = [Float](
         result[i * sample.count..<(i + 1) * sample.count]
       )
