@@ -343,7 +343,7 @@ public final class Sample {
     self.header = header
     self.keywords = keywords
     self.parameters = parameters
-    self._rawEvents = rawEvents
+    _rawEvents = rawEvents
     self.count = count
 
     // If possible, compensate using acquisition matrix

@@ -20,9 +20,9 @@ public struct AsinhTransform : Transform {
     guard p.T > 0 && p.M > 0 && p.A >= 0 && p.A <= p.M else { return nil }
     self.parameters = p
     self.bounds = bounds
-    self._b = (p.M + p.A) * log(10)
-    self._e = sinh(p.M * log(10)) / p.T
-    self._x2 = p.A / (p.M + p.A)
+    _b = (p.M + p.A) * log(10)
+    _e = sinh(p.M * log(10)) / p.T
+    _x2 = p.A / (p.M + p.A)
   }
 
   public func scaling(_ value: Float) -> Float {

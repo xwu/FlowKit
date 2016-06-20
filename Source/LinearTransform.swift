@@ -18,7 +18,7 @@ public struct LinearTransform : Transform {
     guard p.T > 0 && p.A >= 0 && p.A <= p.T else { return nil }
     self.parameters = p
     self.bounds = bounds
-    self._sum = p.T + p.A
+    _sum = p.T + p.A
   }
 
   public func scaling(_ value: Float) -> Float {

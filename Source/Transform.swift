@@ -14,6 +14,7 @@ import Accelerate
 public typealias _Parameters = (T: Float, W: Float, M: Float, A: Float)
 
 public protocol Transform {
+  static var defaultParameters: _Parameters { get }
   var parameters: _Parameters { get }
   var bounds: (Float, Float)? { get }
   var domain: (Float, Float) { get }
@@ -35,12 +36,17 @@ public protocol Transform {
 }
 
 public extension Transform {
+  public static var defaultParameters: _Parameters {
+    return (T: 262144, W: 0.5, M: 4.5, A: 0)
+  }
+
   public var domain: (Float, Float) {
     return (unscaling(0), unscaling(1))
   }
 
   public init?(
-    T: Float = 262144, W: Float = 0.5, M: Float = 4.5, A: Float = 0,
+    T: Float = Self.defaultParameters.T, W: Float = Self.defaultParameters.W,
+    M: Float = Self.defaultParameters.M, A: Float = Self.defaultParameters.A,
     bounds: (Float, Float)? = nil
   ) {
     self.init(parameters: (T, W, M, A), bounds: bounds)
