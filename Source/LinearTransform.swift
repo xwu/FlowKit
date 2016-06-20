@@ -14,10 +14,7 @@ public struct LinearTransform : Transform {
   public let bounds: (Float, Float)?
   internal let _sum: Float
 
-  public init?(
-    parameters p: TransformParameters = TransformParameters(),
-    bounds: (Float, Float)? = nil
-  ) {
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.A >= 0 && p.A <= p.T else { return nil }
 
     // We make new `TransformParameters` to reset any irrelevant parameters to

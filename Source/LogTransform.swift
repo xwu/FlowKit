@@ -13,10 +13,7 @@ public struct LogTransform : Transform {
   public let parameters: TransformParameters
   public let bounds: (Float, Float)?
 
-  public init?(
-    parameters p: TransformParameters = TransformParameters(),
-    bounds: (Float, Float)? = nil
-  ) {
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.M > 0 else { return nil }
 
     // We make new `TransformParameters` to reset any irrelevant parameters to

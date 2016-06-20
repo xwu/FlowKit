@@ -16,10 +16,7 @@ public struct AsinhTransform : Transform {
   // `_e` was chosen because it's not a parameter used in `LogicleTransform`
   internal let _b, _e, _x2: Float
 
-  public init?(
-    parameters p: TransformParameters = TransformParameters(),
-    bounds: (Float, Float)? = nil
-  ) {
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.M > 0 && p.A >= 0 && p.A <= p.M else { return nil }
 
     // We make new `TransformParameters` to reset any irrelevant parameters to

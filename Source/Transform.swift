@@ -24,7 +24,9 @@ public protocol Transform {
   var bounds: (Float, Float)? { get }
   var domain: (Float, Float) { get }
 
-  init?(parameters p: TransformParameters, bounds: (Float, Float)?)
+  init(bounds: (Float, Float)?)
+  init?(_ p: TransformParameters)
+  init?(_ p: TransformParameters, bounds: (Float, Float)?)
 
   func scaling(_ value: Float) -> Float
   func unscaling(_ value: Float) -> Float
@@ -42,6 +44,19 @@ public protocol Transform {
 public extension Transform {
   public var domain: (Float, Float) {
     return (unscaling(0), unscaling(1))
+  }
+
+  public init(bounds: (Float, Float)? = nil) {
+    // It is expected that any type conforming to `Transform` can be initialized
+    // using default parameters; override this initializer if this expectation
+    // is inappropriate for a particular conforming type
+    self.init(TransformParameters(), bounds: bounds)!
+  }
+
+  public init?(_ p: TransformParameters) {
+    // This initializer exists because default arguments are not permitted in
+    // protocol initializer declarations
+    self.init(p, bounds: nil)
   }
 
   public func clipping(_ value: Float) -> Float {
@@ -74,6 +89,7 @@ public extension Transform {
     precondition(min <= max)
 
     var result = [Float](repeating: 0, count: values.count)
+    //FIXME: `vDSP_vclip()` handles NaN incorrectly, unlike `vDSP_vclipD()`
     values.withUnsafeBufferPointer {
       vDSP_vclip($0.baseAddress!, 1, &min, &max, &result, 1, UInt(values.count))
     }
