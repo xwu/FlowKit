@@ -24,7 +24,7 @@ class TransformTests : XCTestCase {
   }
 */
   func testLinearTransform() {
-    let t0 = LinearTransform(TransformParameters(T: 1000, A: 0))!
+    let t0 = LinearTransform(T: 1000, A: 0)!
     XCTAssertEqualWithAccuracy(t0.scaling(-100), -0.1, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t0.scaling(-10), -0.01, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t0.scaling(0), 0, accuracy: 0.000001)
@@ -38,7 +38,7 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(t0.unscaling(0.12), 120, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t0.unscaling(0.01), 10, accuracy: 0.000001)
 
-    let t1 = LinearTransform(TransformParameters(T: 1000, A: 100))!
+    let t1 = LinearTransform(T: 1000, A: 100)!
     XCTAssertEqualWithAccuracy(t1.scaling(-100), 0, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(-10), 0.081818, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(0), 0.090909, accuracy: 0.000001)
@@ -48,7 +48,7 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(t1.scaling(890), 0.9, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(1000), 1, accuracy: 0.000001)
 
-    let t2 = LinearTransform(TransformParameters(T: 1024, A: 256))!
+    let t2 = LinearTransform(T: 1024, A: 256)!
     XCTAssertEqualWithAccuracy(t2.scaling(-100), 0.121875, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t2.scaling(-10), 0.1921875, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t2.scaling(0), 0.2, accuracy: 0.000001)
@@ -69,9 +69,7 @@ class TransformTests : XCTestCase {
       )
     }
 
-    let t3 = LinearTransform(
-      TransformParameters(T: 1000, A: 0), bounds: (0, 0.8)
-    )!
+    let t3 = LinearTransform(T: 1000, A: 0, bounds: (0, 0.8))!
     XCTAssertEqualWithAccuracy(t3.scaling(-100), 0, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t3.scaling(-10), 0, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t3.scaling(0), 0, accuracy: 0.000001)
@@ -87,7 +85,7 @@ class TransformTests : XCTestCase {
   }
 
   func testLogTransform() {
-    let t0 = LogTransform(TransformParameters(T: 10000, M: 5))!
+    let t0 = LogTransform(T: 10000, M: 5)!
     XCTAssertTrue(t0.scaling(-1).isNaN)
     XCTAssertTrue(t0.scaling(0).isInfinite)
     XCTAssertTrue(t0.scaling(0).sign == .minus)
@@ -104,7 +102,7 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(t0.unscaling(0.8), 1000, accuracy: 0.001)
     XCTAssertEqualWithAccuracy(t0.unscaling(0.2), 1, accuracy: 0.000001)
 
-    let t1 = LogTransform(TransformParameters(T: 1023, M: 4.5))!
+    let t1 = LogTransform(T: 1023, M: 4.5)!
     XCTAssertTrue(t1.scaling(-1).isNaN)
     XCTAssertTrue(t1.scaling(0).isInfinite)
     XCTAssertTrue(t1.scaling(0).sign == .minus)
@@ -117,7 +115,7 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(t1.scaling(100000), 1.442250, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(262144), 1.535259, accuracy: 0.000001)
 
-    let t2 = LogTransform()
+    let t2 = LogTransform()!
     XCTAssertTrue(t2.scaling(-1).isNaN)
     XCTAssertTrue(t2.scaling(0).isInfinite)
     XCTAssertTrue(t2.scaling(0).sign == .minus)
@@ -140,10 +138,7 @@ class TransformTests : XCTestCase {
       XCTAssertLessThanOrEqual(abs(a - b), abs(a / 100000))
     }
 
-    let t3 = LogTransform(
-      TransformParameters(T: 10000, M: 5),
-      bounds: (0, .infinity)
-    )!
+    let t3 = LogTransform(T: 10000, M: 5, bounds: (0, .infinity))!
     XCTAssertTrue(t3.scaling(-1).isNaN)
 
     XCTAssertEqualWithAccuracy(t3.scaling(0), 0, accuracy: 0.000001)
@@ -168,7 +163,7 @@ class TransformTests : XCTestCase {
   }
 
   func testAsinhTransform() {
-    let t0 = AsinhTransform(TransformParameters(T: 1000, M: 4, A: 1))!
+    let t0 = AsinhTransform(T: 1000, M: 4, A: 1)!
     XCTAssertEqualWithAccuracy(t0.scaling(-10), -0.200009, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t0.scaling(-5), -0.139829, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t0.scaling(-1), -0.000856, accuracy: 0.000001)
@@ -184,7 +179,7 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(t0.unscaling(0.8), 100, accuracy: 0.0001)
     XCTAssertEqualWithAccuracy(t0.unscaling(0.2), 0, accuracy: 0.000001)
 
-    let t1 = AsinhTransform(TransformParameters(T: 1000, M: 5, A: 0))!
+    let t1 = AsinhTransform(T: 1000, M: 5, A: 0)!
     XCTAssertEqualWithAccuracy(t1.scaling(-10), -0.6, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(-5), -0.539794, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(-1), -0.400009, accuracy: 0.000001)
@@ -196,7 +191,7 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(t1.scaling(100), 0.8, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t1.scaling(1000), 1, accuracy: 0.000001)
 
-    let t2 = AsinhTransform(TransformParameters(T: 1000, M: 3, A: 2))!
+    let t2 = AsinhTransform(T: 1000, M: 3, A: 2)!
     XCTAssertEqualWithAccuracy(t2.scaling(-10), 0.199144, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t2.scaling(-5), 0.256923, accuracy: 0.000001)
     XCTAssertEqualWithAccuracy(t2.scaling(-1), 0.358203, accuracy: 0.000001)

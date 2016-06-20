@@ -10,20 +10,13 @@ import Foundation
 import Accelerate
 
 public struct LogTransform : Transform {
-  public let parameters: TransformParameters
+  public let parameters: _Parameters
   public let bounds: (Float, Float)?
 
-  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
+  public init?(parameters p: _Parameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.M > 0 else { return nil }
-
-    // We make new `TransformParameters` to reset any irrelevant parameters to
-    // their default value
-    self.parameters = TransformParameters(T: p.T, M: p.M)
-    if let (a, b) = bounds where a > b {
-      self.bounds = (b, a)
-    } else {
-      self.bounds = bounds
-    }
+    self.parameters = p
+    self.bounds = bounds
   }
 
   public func scaling(_ value: Float) -> Float {

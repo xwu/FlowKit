@@ -9,24 +9,17 @@
 import Foundation
 import Accelerate
 
-public struct TransformParameters {
-  // These deliberately break naming conventions
-  // (because the corresponding lowercase letters denote other parameters)
-  public let T, W, M, A: Float
-
-  public init(T: Float = 262144, W: Float = 0.5, M: Float = 4.5, A: Float = 0) {
-    self.T = T; self.W = W; self.M = M; self.A = A
-  }
-}
+// These labels deliberately break with naming conventions because certain
+// lowercase letters are used in the specification to denote other parameters
+public typealias _Parameters = (T: Float, W: Float, M: Float, A: Float)
 
 public protocol Transform {
-  var parameters: TransformParameters { get }
+  var parameters: _Parameters { get }
   var bounds: (Float, Float)? { get }
   var domain: (Float, Float) { get }
 
-  init(bounds: (Float, Float)?)
-  init?(_ p: TransformParameters)
-  init?(_ p: TransformParameters, bounds: (Float, Float)?)
+  init?(parameters: _Parameters, bounds: (Float, Float)?)
+  init?(T: Float, W: Float, M: Float, A: Float, bounds: (Float, Float)?)
 
   func scaling(_ value: Float) -> Float
   func unscaling(_ value: Float) -> Float
@@ -46,23 +39,16 @@ public extension Transform {
     return (unscaling(0), unscaling(1))
   }
 
-  public init(bounds: (Float, Float)? = nil) {
-    // It is expected that any type conforming to `Transform` can be initialized
-    // using default parameters; override this initializer if this expectation
-    // is inappropriate for a particular conforming type
-    self.init(TransformParameters(), bounds: bounds)!
-  }
-
-  public init?(_ p: TransformParameters) {
-    // This initializer exists because default arguments are not permitted in
-    // protocol initializer declarations
-    self.init(p, bounds: nil)
+  public init?(
+    T: Float = 262144, W: Float = 0.5, M: Float = 4.5, A: Float = 0,
+    bounds: (Float, Float)? = nil
+  ) {
+    self.init(parameters: (T, W, M, A), bounds: bounds)
   }
 
   public func clipping(_ value: Float) -> Float {
-    guard let (min, max) = bounds else { return value }
-    precondition(min <= max)
-
+    guard let (a, b) = bounds else { return value }
+    let (min, max) = b < a ? (b, a) : (a, b)
     return (value < min) ? min : ((value > max) ? max : value)
   }
 
@@ -85,9 +71,8 @@ public extension Transform {
   }
 
   public func clipping(_ values: [Float]) -> [Float] {
-    guard var (min, max) = bounds else { return values }
-    precondition(min <= max)
-
+    guard let (a, b) = bounds else { return values }
+    var (min, max) = b < a ? (b, a) : (a, b)
     var result = [Float](repeating: 0, count: values.count)
     //FIXME: `vDSP_vclip()` handles NaN incorrectly, unlike `vDSP_vclipD()`
     values.withUnsafeBufferPointer {
