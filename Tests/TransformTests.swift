@@ -166,6 +166,58 @@ class TransformTests : XCTestCase {
       t3.scaling([262144])[0], 1.283708, accuracy: 0.000001
     )
   }
+
+  func testAsinhTransform() {
+    let t0 = AsinhTransform(TransformParameters(T: 1000, M: 4, A: 1))!
+    XCTAssertEqualWithAccuracy(t0.scaling(-10), -0.200009, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(-5), -0.139829, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(-1), -0.000856, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(0), 0.2, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(0.3), 0.303776, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(1), 0.400856, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(3), 0.495521, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(10), 0.600009, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(100), 0.8, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t0.scaling(1000), 1, accuracy: 0.000001)
+
+    XCTAssertEqualWithAccuracy(t0.unscaling(1), 1000, accuracy: 0.001)
+    XCTAssertEqualWithAccuracy(t0.unscaling(0.8), 100, accuracy: 0.0001)
+    XCTAssertEqualWithAccuracy(t0.unscaling(0.2), 0, accuracy: 0.000001)
+
+    let t1 = AsinhTransform(TransformParameters(T: 1000, M: 5, A: 0))!
+    XCTAssertEqualWithAccuracy(t1.scaling(-10), -0.6, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(-5), -0.539794, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(-1), -0.400009, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(0), 0, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(0.3), 0.295521, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(1), 0.400009, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(3), 0.495425, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(10), 0.6, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(100), 0.8, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t1.scaling(1000), 1, accuracy: 0.000001)
+
+    let t2 = AsinhTransform(TransformParameters(T: 1000, M: 3, A: 2))!
+    XCTAssertEqualWithAccuracy(t2.scaling(-10), 0.199144, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(-5), 0.256923, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(-1), 0.358203, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(0), 0.4, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(0.3), 0.412980, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(1), 0.441797, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(3), 0.503776, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(10), 0.600856, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(100), 0.800009, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(t2.scaling(1000), 1, accuracy: 0.000001)
+
+    for _ in 0..<1000 {
+      let v = Float(drand48() * 1000)
+      XCTAssertEqualWithAccuracy(
+        t2.scaling(v), t2.scaling([v])[0], accuracy: 0.000001
+      )
+      let w = Float(drand48())
+      let a = t2.unscaling(w), b = t2.unscaling([w])[0]
+      XCTAssertLessThanOrEqual(abs(a - b), abs(a / 100000))
+    }
+  }
 /*
   func testPerformanceExample() {
     // This is an example of a performance test case
