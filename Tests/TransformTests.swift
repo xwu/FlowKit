@@ -231,6 +231,15 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(
       l._unbinning(l._binning(1000.0)!)!, 1000.0, accuracy: 10
     )
+    let inputs = [0 as Float, 10, 100, 1000, 9999]
+    let actual = l.scaling(inputs)
+    let expected = [0.111084 as Float, 0.310475, 0.552123, 0.777427, 0.999999]
+    let accuracies = [0.000001 as Float, 0.000001, 0.000001, 0.000001, 0.00001]
+    for i in 0..<5 {
+      XCTAssertEqualWithAccuracy(
+        actual[i], expected[i], accuracy: accuracies[i]
+      )
+    }
 
     let l2 = LogicleTransform(T: 10000, W: 0.5, M: 4.5, A: 0, resolution: 0)!
     XCTAssertEqualWithAccuracy(l2.dynamicRange, 3042.12, accuracy: 0.01)
