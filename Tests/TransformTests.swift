@@ -213,6 +213,34 @@ class TransformTests : XCTestCase {
       XCTAssertLessThanOrEqual(abs(a - b), abs(a / 100000))
     }
   }
+
+  func testLogicleTransform() {
+    let l = LogicleTransform(
+      T: 10000, W: 0.5, M: 4.5, A: 0, resolution: 1 << 12
+    )!
+    XCTAssertEqual(l._binning(0.9)!, 562)
+    XCTAssertEqualWithAccuracy(l.scaling(0), 0.111084, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l.scaling(10), 0.310475, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l.scaling(100), 0.552123, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l.scaling(1000), 0.777427, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l.scaling(9999), 0.999999, accuracy: 0.00001)
+    XCTAssertEqualWithAccuracy(l.unscaling(0.5), 59.5513, accuracy: 0.0001)
+    XCTAssertEqualWithAccuracy(
+      l._unbinning(l._binning(59.5513)!)!, 59.5513, accuracy: 0.6
+    )
+    XCTAssertEqualWithAccuracy(
+      l._unbinning(l._binning(1000.0)!)!, 1000.0, accuracy: 10
+    )
+
+    let l2 = LogicleTransform(T: 10000, W: 0.5, M: 4.5, A: 0, resolution: 0)!
+    XCTAssertEqualWithAccuracy(l2.dynamicRange, 3042.12, accuracy: 0.01)
+    XCTAssertEqualWithAccuracy(l2.scaling(0.0), 0.111111, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l2.scaling(10.0), 0.310496, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l2.scaling(100.0), 0.552137, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l2.scaling(1000.0), 0.777433, accuracy: 0.000001)
+    XCTAssertEqualWithAccuracy(l2.scaling(9999.9), 0.999999, accuracy: 0.00001)
+    XCTAssertEqualWithAccuracy(l2.unscaling(0.5), 59.5424, accuracy: 0.0001)
+  }
 /*
   func testPerformanceExample() {
     // This is an example of a performance test case

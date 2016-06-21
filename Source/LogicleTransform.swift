@@ -38,6 +38,7 @@
 
 import Foundation
 import Accelerate
+import Dispatch
 
 public struct LogicleTransform : Transform {
   public static let defaultResolution = 4096
@@ -52,6 +53,9 @@ public struct LogicleTransform : Transform {
   internal let _a, _b, _c, _d, _f, _w, _x0, _x1, _x2: Double
   internal let _taylorCoefficients: [Double]
   internal let _taylorCutoff: Double
+  internal var _bins: [Double] = []
+  internal var _binStrideInverses: [Double] = []
+  internal var _binIndices: [Int] = []
 
   public init?(
     parameters p: _Parameters, bounds: (Float, Float)?, resolution: Int
@@ -135,6 +139,7 @@ public struct LogicleTransform : Transform {
     // Compute Taylor series coefficients
     var positive = _a * exp(_b * _x1), negative = -_c / exp(_d * _x1)
     var t = [Double]()
+    t.reserveCapacity(LogicleTransform.taylorPolynomialDegree)
     for i in 0..<LogicleTransform.taylorPolynomialDegree {
       positive *= _b / (Double(i) + 1); negative *= -_d / (Double(i) + 1)
       t.append(positive + negative)
@@ -143,6 +148,47 @@ public struct LogicleTransform : Transform {
     _taylorCoefficients = t
     // Use Taylor series near `_x1` (i.e., data zero)
     _taylorCutoff = _x1 + _w / 4
+
+    // Initialize internal properties for use in 'fast' approximation
+    //
+    // Note that we need to make use of internal methods, so all properties
+    // below this point must be declared using `var` instead of `let` and must
+    // be assigned a default value
+    guard resolution > 0 else { return }
+
+    // Compute bins
+    var b = [Double](), bsi = [Double]()
+    b.reserveCapacity(resolution + 1); bsi.reserveCapacity(resolution + 1)
+    var previous: Double? = nil
+    for i in 0..<(resolution + 1) {
+      let current = _unscalingWithoutClipping(Double(i) / Double(resolution))
+      b.append(current)
+      if let previous = previous { bsi.append(1 / (current - previous)) }
+      previous = current
+    }
+    // We'll need to append one final element to `bsi` because the array must
+    // have count `resolution + 1`; this is necessary because it is possible to
+    // have `_unbinning(...) == resolution`, necessitating interpolation using
+    // values at index `resolution` and `resolution + 1`
+    if let previous = previous {
+      let current = _unscalingWithoutClipping(
+        Double(resolution + 1) / Double(resolution)
+      )
+      bsi.append(1 / (current - previous))
+    }
+    _bins = b; _binStrideInverses = bsi
+
+    let lower = _unscalingWithoutClipping(0)
+    let upper = _unscalingWithoutClipping(1)
+    let difference = upper - lower
+    var bi = [Int]()
+    bi.reserveCapacity(resolution + 2)
+    bi.append(_binning(lower) ?? 0)
+    for i in 1..<(resolution + 2) {
+      let v = _binning(lower + difference * Double(i) / Double(resolution))
+      bi.append(v ?? resolution)
+    }
+    _binIndices = bi
   }
 
   public init?(
@@ -222,11 +268,136 @@ public struct LogicleTransform : Transform {
     return isNegative ? -unscaledValue : unscaledValue
   }
 
+  internal func _binning(_ value: Double) -> Int? {
+    guard _resolution > 0 else { return nil }
+    // Binary search for appropriate bin
+    var lo = 0, hi = _resolution
+    while lo <= hi {
+      let mid = (lo + hi) >> 1, key = _bins[mid]
+      if value < key {
+        hi = mid - 1
+      } else if value > key {
+        lo = mid + 1
+      } else if mid < _resolution {
+        return mid
+      } else {
+        return nil
+      }
+    }
+    // Check range
+    if hi < 0 || lo > _resolution { return nil }
+    return lo - 1
+  }
+
+  internal func _unbinning(_ index: Int) -> Double? {
+    // This `guard` condition also covers the case where `_resolution == 0`
+    guard index >= 0 && index < _resolution else { return nil }
+    return _bins[index]
+  }
+
   public func scaling(_ value: Float) -> Float {
-    return clipping(Float(_scalingWithoutClipping(Double(value))))
+    let value = Double(value)
+    if _resolution > 0 {
+      if let i = _binning(value) {
+        let delta = (value - _bins[i]) / (_bins[i + 1] - _bins[i])
+        return clipping(Float((Double(i) + delta) / Double(_resolution)))
+      }
+    }
+    return clipping(Float(_scalingWithoutClipping(value)))
   }
 
   public func unscaling(_ value: Float) -> Float {
-    return Float(_unscalingWithoutClipping(Double(clipping(value))))
+    let value = Double(clipping(value))
+    if _resolution > 0 {
+      // Find the bin
+      let x = value * Double(_resolution)
+      let i = Int(floor(x))
+      if i >= 0 && i < _resolution {
+        // Interpolate linearly
+        let delta = x - Double(i)
+        return Float((1 - delta) * _bins[i] + delta * _bins[i + 1])
+      }
+    }
+    return Float(_unscalingWithoutClipping(value))
+  }
+
+  public func scaling(_ values: [Float]) -> [Float] {
+    precondition(_resolution > 0)
+    //TODO: Handle input values not in domain
+    var indices = [Double](repeating: 0, count: values.count)
+    let lower = _unscalingWithoutClipping(0)
+    let upper = _unscalingWithoutClipping(1)
+    let difference = upper - lower
+    let resolution = _resolution
+    outer: for i in 0..<values.count {
+      let value = Double(values[i])
+      let j = Int((value - lower) / difference * Double(resolution))
+      if j < 0 {
+        //FIXME: Do the right thing if we aren't clipping
+        indices[i] = 0
+        continue outer
+      }
+      if j > resolution {
+        //FIXME: Do the right thing if we aren't clipping
+        indices[i] = Double(resolution)
+        continue outer
+      }
+      var lo = _binIndices[j], hi = _binIndices[j + 1]
+      if lo == hi {
+        indices[i] = Double(lo)
+        continue outer
+      }
+      // Binary search for appropriate bin
+      while lo <= hi {
+        let mid = (lo + hi) >> 1, key = _bins[mid]
+        if value < key {
+          hi = mid - 1
+        } else if value > key {
+          lo = mid + 1
+        } else {
+          indices[i] = Double(mid)
+          continue outer
+        }
+      }
+      indices[i] = Double(lo - 1)
+    }
+
+    var v0 = [Double](repeating: 0, count: values.count)
+    var v1 = [Double](repeating: 0, count: values.count)
+    var v2 = [Double](repeating: 0, count: values.count)
+    var v3 = [Float](repeating: 0, count: values.count)
+    // SP to DP
+    vDSP_vspdp(values, 1, &v0, 1, UInt(values.count))
+    // Gather values from `_binStrideInverses` based on `indices`
+    vDSP_vindexD(_binStrideInverses, &indices, 1, &v1, 1, UInt(values.count))
+    // Gather values from `_bins` based on `indices`
+    vDSP_vindexD(_bins, &indices, 1, &v2, 1, UInt(values.count))
+    // Compute `(values - v2) * v1`, storing in v1
+    v0.withUnsafeBufferPointer{
+      vDSP_vsbmD($0.baseAddress!, 1, &v2, 1, &v1, 1, &v1, 1, UInt(values.count))
+    }
+    // Compute `(indices + v1) / Double(resolution)`, storing in v2
+    var ir = 1 / Double(resolution)
+    vDSP_vasmD(&indices, 1, &v1, 1, &ir, &v2, 1, UInt(values.count))
+    // DP to SP
+    vDSP_vdpsp(&v2, 1, &v3, 1, UInt(values.count))
+    return clipping(v3)
+  }
+
+  public func unscaling(_ values: [Float]) -> [Float] {
+    precondition(_resolution > 0)
+    //TODO: Handle input values less than 0 or greater than 1
+    var v0 = clipping(values)
+    // SP to DP
+    var v1 = [Double](repeating: 0, count: v0.count)
+    vDSP_vspdp(&v0, 1, &v1, 1, UInt(v0.count))
+    // Find the bin and interpolate linearly
+    var r = Double(_resolution), zero = 0 as Double
+    vDSP_vtabiD(
+      &v1, 1, &r, &zero, _bins, UInt(_bins.count), &v1, 1, UInt(v0.count)
+    )
+    // DP to SP
+    vDSP_vdpsp(&v1, 1, &v0, 1, UInt(v0.count))
+    return v0
   }
 }
