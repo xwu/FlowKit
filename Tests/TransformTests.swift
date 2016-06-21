@@ -241,6 +241,18 @@ class TransformTests : XCTestCase {
     XCTAssertEqualWithAccuracy(l2.scaling(9999.9), 0.999999, accuracy: 0.00001)
     XCTAssertEqualWithAccuracy(l2.unscaling(0.5), 59.5424, accuracy: 0.0001)
   }
+
+  func testLogicleTransformPerformance() {
+    let l = LogicleTransform(T: 10000, W: 0.5, M: 4.5, A: 0)!
+    var input = [Float]()
+    for _ in 0..<1000000 {
+      input.append(Float(drand48() * 10000))
+    }
+    self.measure {
+      let result = l.scaling(input)
+      print(result[42])
+    }
+  }
 /*
   func testPerformanceExample() {
     // This is an example of a performance test case
