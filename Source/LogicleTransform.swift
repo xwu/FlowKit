@@ -38,7 +38,6 @@
 
 import Foundation
 import Accelerate
-import Dispatch
 
 public struct LogicleTransform : Transform {
   public static let defaultResolution = 4096
