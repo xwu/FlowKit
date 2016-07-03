@@ -50,20 +50,21 @@ public struct LogicleTransform : Transform {
     return Float(_slope(1) / _slope(_x1))
   }
   internal let _resolution: Int
-  internal let _a, _b, _c, _d, _f, _w, _x0, _x1, _x2: Double
+  // Note that `_e` is not a parameter used in `LogicleTransform`
+  // See comment in `AsinhTransform`
+  internal let _a, _b, _c, _d, _e, _f, _w, _x0, _x1, _x2: Double
   internal let _taylorCoefficients: [Double]
   internal let _taylorCutoff: Double
   internal var _bins: [Double] = []
+  /*
   internal var _binStrideInverses: [Double] = []
   internal var _binIndices: [Int] = []
+  */
+  internal var _asinhToLogicleBins: [Double] = []
 
   public init?(
     parameters p: _Parameters, bounds: (Float, Float)?, resolution: Int
   ) {
-    self.parameters = p
-    self.bounds = bounds
-    _resolution = resolution
-
     // Internally, we use double precision and adjust `A`
     let T = Double(p.T), W = Double(p.W), M = Double(p.M)
     var A = Double(p.A)
@@ -72,12 +73,17 @@ public struct LogicleTransform : Transform {
       zero = floor(zero * Double(resolution) + 0.5) / Double(resolution)
       A = (M * zero - W) / (1 - zero)
     }
+    // guard T > 0 && M > 0 && A >= 0 && A <= M else { return nil }
+    self.parameters = p
+    self.bounds = bounds
+    _resolution = resolution
 
     // Initialize actual parameters (formulas from biexponential paper)
     _w = W / (M + A)
     _x2 = A / (M + A)
     _x1 = _x2 + _w
     _x0 = _x2 + 2 * _w
+    _e = sinh(M * log(10)) / T
     _b = (M + A) * log(10)
 
     func solve(_ b: Double, _ w: Double) -> Double? {
@@ -158,7 +164,8 @@ public struct LogicleTransform : Transform {
 
     // Compute bins
     var b = [Double](), bsi = [Double]()
-    b.reserveCapacity(resolution + 1); bsi.reserveCapacity(resolution + 1)
+    b.reserveCapacity(resolution + 1)
+    bsi.reserveCapacity(resolution + 1)
     var previous: Double? = nil
     for i in 0..<(resolution + 1) {
       let current = _unscalingWithoutClipping(Double(i) / Double(resolution))
@@ -176,7 +183,9 @@ public struct LogicleTransform : Transform {
       )
       bsi.append(1 / (current - previous))
     }
-    _bins = b; _binStrideInverses = bsi
+    _bins = b
+    /*
+    _binStrideInverses = bsi
 
     let lower = _unscalingWithoutClipping(0)
     let upper = _unscalingWithoutClipping(1)
@@ -189,6 +198,15 @@ public struct LogicleTransform : Transform {
       bi.append(v ?? resolution)
     }
     _binIndices = bi
+    */
+
+    var alb = [Double]()
+    alb.reserveCapacity(resolution * 2 + 1)
+    for i in -resolution...resolution {
+      let v = Double(i) / Double(resolution)
+      alb.append(_scalingWithoutClipping(sinh((v - _x2) * _b) / _e))
+    }
+    _asinhToLogicleBins = alb
   }
 
   public init?(
@@ -268,6 +286,7 @@ public struct LogicleTransform : Transform {
     return isNegative ? -unscaledValue : unscaledValue
   }
 
+/*
   internal func _binning(_ value: Double) -> Int? {
     guard _resolution > 0 else { return nil }
     // Binary search for appropriate bin
@@ -294,13 +313,24 @@ public struct LogicleTransform : Transform {
     guard index >= 0 && index < _resolution else { return nil }
     return _bins[index]
   }
+*/
 
   public func scaling(_ value: Float) -> Float {
     let value = Double(value)
     if _resolution > 0 {
+      /*
       if let i = _binning(value) {
         let delta = (value - _bins[i]) / (_bins[i + 1] - _bins[i])
         return clipping(Float((Double(i) + delta) / Double(_resolution)))
+      }
+      */
+      let a = (asinh(value * _e) / _b) + _x2
+      if a >= -1 && a <= 1 {
+        let p = a * Double(_resolution) + Double(_resolution), q = floor(p)
+        let index = Int(q), delta = p - q
+        let interpolation = (1 - delta) * _asinhToLogicleBins[index] +
+          delta * _asinhToLogicleBins[index + 1]
+        return clipping(Float(interpolation))
       }
     }
     return clipping(Float(_scalingWithoutClipping(value)))
@@ -324,6 +354,7 @@ public struct LogicleTransform : Transform {
   public func scaling(_ values: [Float]) -> [Float] {
     precondition(_resolution > 0)
     //TODO: Handle input values not in domain
+    /*
     var indices = [Double](repeating: 0, count: values.count)
     let lower = _unscalingWithoutClipping(0)
     let upper = _unscalingWithoutClipping(1)
@@ -382,6 +413,26 @@ public struct LogicleTransform : Transform {
     // DP to SP
     vDSP_vdpsp(&v2, 1, &v3, 1, UInt(values.count))
     return clipping(v3)
+    */
+    var v4 = [Double](repeating: 0, count: values.count)
+    var v5 = [Double](repeating: 0, count: values.count)
+    var v6 = [Double](repeating: 0, count: values.count)
+    var v7 = [Float](repeating: 0, count: values.count)
+    // SP to DP
+    vDSP_vspdp(values, 1, &v4, 1, UInt(v4.count))
+    // Compute asinh transform
+    var c = Int32(v4.count), e = _e, ib = 1 / _b, x2 = _x2
+    v4.withUnsafeBufferPointer {
+      vDSP_vsmulD($0.baseAddress!, 1, &e, &v5, 1, UInt(v4.count))
+    }
+    vvasinh(&v6, &v5, &c) // This cannot be done in-place
+    vDSP_vsmsaD(&v6, 1, &ib, &x2, &v6, 1, UInt(v4.count))
+    // Interpolate
+    var s = Double(_resolution), m = UInt(_asinhToLogicleBins.count)
+    vDSP_vtabiD(&v6, 1, &s, &s, _asinhToLogicleBins, m, &v6, 1, UInt(v4.count))
+    // DP to SP
+    vDSP_vdpsp(&v6, 1, &v7, 1, UInt(v4.count))
+    return clipping(v7)
   }
 
   public func unscaling(_ values: [Float]) -> [Float] {
@@ -392,9 +443,9 @@ public struct LogicleTransform : Transform {
     var v1 = [Double](repeating: 0, count: v0.count)
     vDSP_vspdp(&v0, 1, &v1, 1, UInt(v0.count))
     // Find the bin and interpolate linearly
-    var r = Double(_resolution), zero = 0 as Double
+    var s1 = Double(_resolution), s2 = 0 as Double
     vDSP_vtabiD(
-      &v1, 1, &r, &zero, _bins, UInt(_bins.count), &v1, 1, UInt(v0.count)
+      &v1, 1, &s1, &s2, _bins, UInt(_bins.count), &v1, 1, UInt(v0.count)
     )
     // DP to SP
     vDSP_vdpsp(&v1, 1, &v0, 1, UInt(v0.count))
