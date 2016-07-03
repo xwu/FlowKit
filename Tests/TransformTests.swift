@@ -280,7 +280,6 @@ class TransformTests : XCTestCase {
       print(result[42])
     }
   }
-
 /*
   func testPerformanceExample() {
     // This is an example of a performance test case

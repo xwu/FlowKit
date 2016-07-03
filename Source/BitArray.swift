@@ -89,7 +89,7 @@ public struct BitArray {
     return BitArray(_bits: v, count: bounds.count)
   }
 
-  public func cardinality(in range: Range<Int>?) -> Int {
+  public func cardinality(in range: Range<Int>? = nil) -> Int {
     return CFBitVectorGetCountOfBit(_bitVector, CFRange(range ?? 0..<count), 1)
   }
 
@@ -124,6 +124,10 @@ public struct BitArray {
     }
   }
 
+  public mutating func clear(_ range: ClosedRange<Int>) {
+    clear(range.lowerBound..<range.upperBound + 1)
+  }
+
   public mutating func clear(_ index: Int) {
     self[index] = .zero
   }
@@ -133,6 +137,10 @@ public struct BitArray {
       precondition(range.lowerBound >= 0 && range.upperBound <= count)
     }
     CFBitVectorFlipBits(_bitVectorCoW, CFRange(range ?? 0..<count))
+  }
+
+  public mutating func flip(_ range: ClosedRange<Int>) {
+    flip(range.lowerBound..<range.upperBound + 1)
   }
 
   public mutating func flip(_ index: Int) {
@@ -151,6 +159,10 @@ public struct BitArray {
     } else {
       CFBitVectorSetAllBits(_bitVectorCoW, 1)
     }
+  }
+
+  public mutating func set(_ range: ClosedRange<Int>) {
+    set(range.lowerBound..<range.upperBound + 1)
   }
 
   public mutating func set(_ index: Int) {
@@ -187,7 +199,7 @@ extension BitArray : Collection {
 
 extension BitArray : CustomStringConvertible {
   public var description: String {
-    return self.reduce("") { $0 + "\($1.rawValue)" }
+    return self.reduce("") { $0 + String($1.rawValue) }
   }
 }
 

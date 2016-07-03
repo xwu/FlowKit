@@ -14,6 +14,7 @@
 		855AE2181D175AF300A87EE1 /* TransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2171D175AF300A87EE1 /* TransformTests.swift */; };
 		8592A0431D18852E001EDB65 /* LogicleTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8592A0421D18852E001EDB65 /* LogicleTransform.swift */; };
 		85C208EF1D28DFB0001031D8 /* BitArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208EE1D28DFB0001031D8 /* BitArray.swift */; };
+		85C208F11D28E871001031D8 /* BitArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208F01D28E871001031D8 /* BitArrayTests.swift */; };
 		85C5CB841D15BFBD00FF5367 /* FlowKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 85C5CB831D15BFBD00FF5367 /* FlowKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85C5CB8B1D15BFBD00FF5367 /* FlowKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C5CB801D15BFBD00FF5367 /* FlowKit.framework */; };
 		85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5CB8F1D15BFBD00FF5367 /* SampleTests.swift */; };
@@ -43,6 +44,7 @@
 		855AE2171D175AF300A87EE1 /* TransformTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformTests.swift; path = Tests/TransformTests.swift; sourceTree = SOURCE_ROOT; };
 		8592A0421D18852E001EDB65 /* LogicleTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogicleTransform.swift; sourceTree = "<group>"; };
 		85C208EE1D28DFB0001031D8 /* BitArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitArray.swift; sourceTree = "<group>"; };
+		85C208F01D28E871001031D8 /* BitArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitArrayTests.swift; path = Tests/BitArrayTests.swift; sourceTree = SOURCE_ROOT; };
 		85C5CB801D15BFBD00FF5367 /* FlowKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FlowKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		85C5CB831D15BFBD00FF5367 /* FlowKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlowKit.h; sourceTree = "<group>"; };
 		85C5CB851D15BFBD00FF5367 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				85C5CB8F1D15BFBD00FF5367 /* SampleTests.swift */,
 				85C6DE611D17291D00F34E13 /* CompensationTests.swift */,
 				855AE2171D175AF300A87EE1 /* TransformTests.swift */,
+				85C208F01D28E871001031D8 /* BitArrayTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -277,6 +280,7 @@
 				855AE2181D175AF300A87EE1 /* TransformTests.swift in Sources */,
 				85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */,
 				85C6DE621D17291D00F34E13 /* CompensationTests.swift in Sources */,
+				85C208F11D28E871001031D8 /* BitArrayTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
