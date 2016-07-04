@@ -230,22 +230,22 @@ public final class Sample {
           }
         }
       case "I":
-        let adjustBitwidth: Bool
+        let adjustBitWidth: Bool
         if let sys = keywords["$SYS"]?.uppercased()
           where sys == "CXP" || sys == "CPX" {
-          adjustBitwidth = true
+          adjustBitWidth = true
         } else {
-          adjustBitwidth = false
+          adjustBitWidth = false
         }
-        let bitwidths: [Int] = (1...par).map {
+        let bitWidths: [Int] = (1...par).map {
           guard
-            let bw = keywords["$P\($0)B"], bitwidth = Int(bw)
+            let bw = keywords["$P\($0)B"], bitWidth = Int(bw)
             else { return 0 }
-          if [64, 32, 16, 8].contains(bitwidth) { return bitwidth }
-          return (bitwidth == 10 && adjustBitwidth) ? 16 : 0
+          if [64, 32, 16, 8].contains(bitWidth) { return bitWidth }
+          return (bitWidth == 10 && adjustBitWidth) ? 16 : 0
         }
-        if bitwidths.contains(0) { return nil }
-        let bytelengths = bitwidths.map { $0 / 8 }
+        if bitWidths.contains(0) { return nil }
+        let bytelengths = bitWidths.map { $0 / 8 }
 
         // Populate an array that gives the position of the nth parameter
         // relative to the position of the first parameter for that event
@@ -258,7 +258,7 @@ public final class Sample {
           // Don't mask anything if required value is missing
           guard
             let ra = keywords["$P\($0)R"], range = Int(ra)
-            else { return 1 << bitwidths[$0 - 1] }
+            else { return 1 << bitWidths[$0 - 1] }
           return range
         }
         let bitmasks = ranges.map { 1 << UInt64(ceil(log2(Double($0)))) }
