@@ -326,15 +326,21 @@ public struct BitArray {
   }
 }
 
-extension BitArray : Collection {
-  public var endIndex: Int { return count }
+extension BitArray : BidirectionalCollection {
   public var startIndex: Int { return 0 }
+  public var endIndex: Int { return count }
 
   public func index(after i: Int) -> Int {
     return i + 1
   }
   public func formIndex(after i: inout Int) {
     i += 1
+  }
+  public func index(before i: Int) -> Int {
+    return i - 1
+  }
+  public func formIndex(before i: inout Int) {
+    i -= 1
   }
 
   //TODO: Implement a more efficient `elementsEqual`
