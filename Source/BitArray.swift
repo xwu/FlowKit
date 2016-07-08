@@ -38,219 +38,291 @@ internal extension UInt32 {
     c += Int(_LeadingZerosLookupTable.nibble[Int(v >> 28)])
     return c
   }
-}
 
-internal struct _PopcountLookupTable {
-  static let nibble = [0 as UInt8, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4]
-  private init() { }
-}
-
-internal extension UInt8 {
-  static var _bitWidth: Int { return 32 }
-
-  var _popcount: Int {
-    return Int(_PopcountLookupTable.nibble[Int(self >> 4)] +
-      _PopcountLookupTable.nibble[Int(self & UInt8(0x0F))])
-  }
-  var _leadingZeros: Int {
-    var v = self, c: Int
-    if (v & UInt8(0xF0)) == 0 { c = 4; v <<= 4 } else { c = 0 }
-    c += Int(_LeadingZerosLookupTable.nibble[Int(v >> 4)])
-    return c
+  /// The number of zeros following the least significant one bit in the binary
+  /// representation of the current value.
+  var _trailingZeros: Int {
+    // Based on the mathematical relation outlined at:
+    // https://en.wikipedia.org/wiki/Find_first_set#Properties_and_relations
+    let leastSignificantBit =
+      (Int32(bitPattern: self) & -Int32(bitPattern: self))
+    return UInt32(bitPattern: leastSignificantBit - 1)._popcount
   }
 }
 
-internal extension CFRange {
-  init(_ range: Range<Int>) {
-    location = range.lowerBound
-    length = range.count
-  }
-}
-
-public enum Bit : CFBit {
+public enum Bit : UInt8 {
   case zero = 0, one
 }
 
-internal final class _BitVectorBox {
-  internal var value: CFMutableBitVector
-  internal init(_ value: CFMutableBitVector) {
-    self.value = value
-  }
-}
-
 public struct BitArray {
-  public typealias Word = UInt8
-
-  // Copy-on-write
-  internal var _bitVectorBox: _BitVectorBox = {
-    return _BitVectorBox(CFBitVectorCreateMutable(kCFAllocatorDefault, 0))
-  }()
-
-  internal var _bitVector: CFMutableBitVector {
-    get { return _bitVectorBox.value }
-    set { _bitVectorBox = _BitVectorBox(newValue) }
+  internal enum _Mutation {
+    case set, clear, flip
   }
+  public typealias Word = UInt32
 
-  internal var _bitVectorCoW: CFMutableBitVector {
-    mutating get {
-      if !isUniquelyReferencedNonObjC(&_bitVectorBox) {
-        _bitVector = CFBitVectorCreateMutableCopy(
-          kCFAllocatorDefault, 0, _bitVector
-        )
+  internal let _offset: Int
+  public let count: Int
+  // Note: various methods below assume that `words` has only the minimum number
+  //       of elements necessary for storing `count` bits prefixed by `_offset`
+  //       (zero) bits
+  public internal(set) var words: [Word] = []
+
+  internal init(_words: [Word], offset: Int, count: Int) {
+    precondition(offset >= 0 && count >= 0)
+    let bitOffset = offset % Word._bitWidth
+    _offset = bitOffset
+    self.count = count
+    let wordOffset = offset / Word._bitWidth
+    let i = _words.count - wordOffset
+    // Note: if `offset >= _words.count * Word._bitWidth`, then `i <= 0`
+    let f = (bitOffset + count + Word._bitWidth - 1) / Word._bitWidth
+    if f < i {
+      words = [Word](_words.dropFirst(wordOffset).prefix(f))
+    } else if f == i {
+      words = wordOffset == 0 ? _words : [Word](_words.dropFirst(wordOffset))
+    } else {
+      words = [Word](repeating: 0, count: f)
+      if i > 0 {
+        words.replaceSubrange(0..<i, with: _words[wordOffset..<_words.count])
       }
-      return _bitVector
     }
-  }
-
-  internal var _offset: Int = 0
-
-/*
-  internal var _firstWordMask: Word? {
-    guard _offset > 0 || count > 0 else { return nil }
-    return (Word.max >> Word(_offset % BitArray.Word._bitWidth))
-  }
-
-  internal var _lastWordMask: Word? {
-    guard _offset > 0 || count > 0 else { return nil }
-    let remainder =
-      (_offset + count + BitArray.Word._bitWidth - 1) % BitArray.Word._bitWidth
-    return (Word.max << Word(BitArray.Word._bitWidth - remainder))
-  }
-*/
-
-  public var count: Int {
-    get { return CFBitVectorGetCount(_bitVector) }
-    set { CFBitVectorSetCount(_bitVectorCoW, newValue) }
-  }
-
-  public var words: [Word] = []
-
-  private var __words: [Word] {
-    var v = [Word](
-      repeating: 0,
-      count: (/* _offset + */ count + BitArray.Word._bitWidth - 1) /
-        BitArray.Word._bitWidth
-    )
-    CFBitVectorGetBits(_bitVector, CFRange(0..<count), &v)
-    return v
+    assert(words.count == f)
+    _maskFirstWordFragment()
+    _maskLastWordFragment()
   }
 
   public init(words: [Word], count: Int) {
-    let bv = CFBitVectorCreate(kCFAllocatorDefault, words, count)
-    _bitVector = CFBitVectorCreateMutableCopy(kCFAllocatorDefault, 0, bv)
-    self.words = __words
+    precondition(count >= 0)
+    _offset = 0
+    self.count = count
+    let i = words.count
+    let f = (count + Word._bitWidth - 1) / Word._bitWidth
+    if f < i {
+      self.words = [Word](words.prefix(f))
+    } else if f == i {
+      self.words = words
+    } else {
+      self.words = [Word](repeating: 0, count: f)
+      self.words.replaceSubrange(0..<i, with: words)
+    }
+    assert(self.words.count == f)
+    _maskLastWordFragment()
   }
 
-  public init() { }
-
-  public init(repeating repeatedValue: Bit, count: Int) {
-    CFBitVectorSetCount(_bitVectorCoW, count)
-    CFBitVectorSetAllBits(_bitVectorCoW, repeatedValue.rawValue)
-    words = __words
+  public init(repeating repeatedValue: Bit = .zero, count: Int) {
+    precondition(count >= 0)
+    _offset = 0
+    self.count = count
+    let wc = (count + Word._bitWidth - 1) / Word._bitWidth
+    let rv = repeatedValue == .zero ? 0 : Word.max
+    self.words = [Word](repeating: rv, count: wc)
+    _maskLastWordFragment()
   }
 
   public subscript(_ position: Int) -> Bit {
-    precondition(position >= 0 && position < count)
-    return Bit(rawValue: CFBitVectorGetBitAtIndex(_bitVector, position))!
+    let bitOffset = (_offset + position) % Word._bitWidth
+    let mask = 1 << Word(Word._bitWidth - bitOffset - 1)
+    let wordOffset = (_offset + position) / Word._bitWidth
+    let isZero = (words[wordOffset] & mask) == 0
+    return isZero ? .zero : .one
   }
 
   public subscript(_ bounds: Range<Int>) -> BitArray {
     precondition(bounds.lowerBound >= 0 && bounds.upperBound <= count)
-    var v = [Word](
-      repeating: 0,
-      count: (bounds.count + BitArray.Word._bitWidth - 1) /
-        BitArray.Word._bitWidth
+    return BitArray(
+      _words: words, offset: _offset + bounds.lowerBound, count: bounds.count
     )
-    CFBitVectorGetBits(_bitVector, CFRange(bounds), &v)
-    return BitArray(words: v, count: bounds.count)
   }
 
-  public func cardinality(in range: Range<Int>? = nil) -> Int {
-    return CFBitVectorGetCountOfBit(_bitVector, CFRange(range ?? 0..<count), 1)
-  }
-
-  public func contains(_ bit: Bit, in range: Range<Int>) -> Bool {
-    return CFBitVectorContainsBit(_bitVector, CFRange(range), bit.rawValue)
-  }
-
-  public func index(of bit: Bit, in range: Range<Int>) -> Int? {
-    let v = CFBitVectorGetFirstIndexOfBit(
-      _bitVector, CFRange(range), bit.rawValue
-    )
-    return v == kCFNotFound ? nil : v
-  }
-
-  public func lastIndex(of bit: Bit, in range: Range<Int>) -> Int? {
-    let v = CFBitVectorGetLastIndexOfBit(
-      _bitVector, CFRange(range), bit.rawValue
-    )
-    return v == kCFNotFound ? nil : v
-  }
-
-  public mutating func clear(_ range: Range<Int>? = nil) {
-    if let range = range {
-      precondition(range.lowerBound >= 0 && range.upperBound <= count)
-      CFBitVectorSetBits(
-        _bitVectorCoW, CFRange(
-          location: range.lowerBound, length: range.count
-        ), 0
-      )
-    } else {
-      CFBitVectorSetAllBits(_bitVectorCoW, 0)
+  // Note: various methods below assume bits preceding `_offset` are zero; thus,
+  //       it is critical to call this method after `words` is populated
+  internal mutating func _maskFirstWordFragment() {
+    guard _offset > 0 else { return }
+    let mask = Word.max >> Word(_offset)
+    if let first = words.first where first != (first & mask) {
+      words[0] = (first & mask)
     }
-    words = __words
   }
 
-  public mutating func clear(_ range: ClosedRange<Int>) {
-    clear(range.lowerBound..<range.upperBound + 1)
-  }
-
-  public mutating func clear(_ index: Int) {
-    precondition(index >= 0 && index < count)
-    CFBitVectorSetBitAtIndex(_bitVectorCoW, index, 0)
-    words = __words
-  }
-
-  public mutating func flip(_ range: Range<Int>? = nil) {
-    if let range = range {
-      precondition(range.lowerBound >= 0 && range.upperBound <= count)
+  // Note: various methods below assume bits past `_offset + count` are zero;
+  //       thus, it is critical to call this method after `words` is populated
+  internal mutating func _maskLastWordFragment() {
+    let remainder = (_offset + count) % Word._bitWidth
+    let shift = (Word._bitWidth - remainder) % Word._bitWidth
+    let mask = Word.max << Word(shift)
+    if let last = words.last where last != (last & mask) {
+      words[words.endIndex - 1] = (last & mask)
     }
-    CFBitVectorFlipBits(_bitVectorCoW, CFRange(range ?? 0..<count))
-    words = __words
   }
 
-  public mutating func flip(_ range: ClosedRange<Int>) {
-    flip(range.lowerBound..<range.upperBound + 1)
+  internal mutating func _execute(
+    _ mutation: _Mutation, over range: Range<Int>? = nil
+    ) {
+    let range = range ?? 0..<count
+    guard range.count > 0 else { return }
+
+    let a = (_offset + range.lowerBound) / Word._bitWidth
+    let b = (_offset + range.upperBound + Word._bitWidth - 1) / Word._bitWidth
+    let firstMask =
+      Word.max >> Word((_offset + range.lowerBound) % Word._bitWidth)
+    let lastMask =
+      Word.max << Word((
+        Word._bitWidth - ((_offset + range.upperBound) % Word._bitWidth)
+        ) % Word._bitWidth)
+
+    if b - a == 1 {
+      let mask = firstMask & lastMask
+      switch mutation {
+      case .set:
+        words[a] |= mask
+      case .clear:
+        words[a] &= ~mask
+      case .flip:
+        words[a] = (words[a] & ~mask) | (~words[a] & mask)
+      }
+      return
+    }
+
+    let indices = (a + 1)..<(b - 1)
+    switch mutation {
+    case .set:
+      words[a] |= firstMask
+      for i in indices { words[i] = Word.max }
+      words[b - 1] |= lastMask
+    case .clear:
+      words[a] &= ~firstMask
+      for i in indices { words[i] = 0 }
+      words[b - 1] &= ~lastMask
+    case .flip:
+      words[a] = (words[a] & ~firstMask) | (~words[a] & firstMask)
+      for i in indices { words[i] = ~words[i] }
+      words[b - 1] = (words[b - 1] & ~lastMask) | (~words[b - 1] & lastMask)
+    }
   }
 
-  public mutating func flip(_ index: Int) {
-    precondition(index >= 0 && index < count)
-    CFBitVectorFlipBitAtIndex(_bitVectorCoW, index)
-    words = __words
+  internal mutating func _execute(_ mutation: _Mutation, at index: Int) {
+    let bitOffset = (_offset + index) % Word._bitWidth
+    let mask = 1 << Word(Word._bitWidth - bitOffset - 1)
+    let wordOffset = (_offset + index) / Word._bitWidth
+    switch mutation {
+    case .set:
+      words[wordOffset] |= mask
+    case .clear:
+      words[wordOffset] &= ~mask
+    case .flip:
+      words[wordOffset] =
+        (words[wordOffset] & ~mask) | (~words[wordOffset] & mask)
+    }
+  }
+
+  public func cardinality() -> Int {
+    var v = 0
+    for w in words {
+      v += w._popcount
+    }
+    return v
+  }
+
+  public func contains(_ bit: Bit) -> Bool {
+    return cardinality() != ((bit == .zero) ? count : 0)
+  }
+
+  public func index(of bit: Bit) -> Int? {
+    var v = -_offset
+    switch bit {
+    case .zero:
+      if let w = words.first {
+        let clz = (~w & (Word.max >> Word(_offset)))._leadingZeros
+        v += clz
+        if clz < Word._bitWidth {
+          return v < count ? v : nil
+        }
+      }
+      for w in words.dropFirst() {
+        let clz = (~w)._leadingZeros
+        v += clz
+        if clz < Word._bitWidth {
+          return v < count ? v : nil
+        }
+      }
+    case .one:
+      for w in words {
+        let clz = w._leadingZeros
+        v += clz
+        if clz < Word._bitWidth {
+          return v
+        }
+      }
+    }
+    return nil
+  }
+
+  public func lastIndex(of bit: Bit) -> Int? {
+    let remainder = (_offset + count) % Word._bitWidth
+    let shift = (Word._bitWidth - remainder) % Word._bitWidth
+    var v = count + shift - 1
+    switch bit {
+    case .zero:
+      if let w = words.last {
+        let ctz = (~w & (Word.max << Word(shift)))._trailingZeros
+        v -= ctz
+        if ctz < Word._bitWidth {
+          return v >= 0 ? v : nil
+        }
+      }
+      for w in words.dropLast().reversed() {
+        let ctz = (~w)._trailingZeros
+        v -= ctz
+        if ctz < Word._bitWidth {
+          return v >= 0 ? v : nil
+        }
+      }
+    case .one:
+      for w in words.reversed() {
+        let ctz = w._trailingZeros
+        v -= ctz
+        if ctz < Word._bitWidth {
+          return v
+        }
+      }
+    }
+    return nil
   }
 
   public mutating func set(_ range: Range<Int>? = nil) {
-    if let range = range {
-      precondition(range.lowerBound >= 0 && range.upperBound <= count)
-      CFBitVectorSetBits(
-        _bitVectorCoW, CFRange(
-          location: range.lowerBound, length: range.count
-        ), 1
-      )
-    } else {
-      CFBitVectorSetAllBits(_bitVectorCoW, 1)
-    }
-    words = __words
+    _execute(.set, over: range)
   }
 
   public mutating func set(_ range: ClosedRange<Int>) {
-    set(range.lowerBound..<range.upperBound + 1)
+    _execute(.set, over: range.lowerBound..<range.upperBound + 1)
   }
 
   public mutating func set(_ index: Int) {
-    precondition(index >= 0 && index < count)
-    CFBitVectorSetBitAtIndex(_bitVectorCoW, index, 1)
-    words = __words
+    _execute(.set, at: index)
+  }
+
+  public mutating func clear(_ range: Range<Int>? = nil) {
+    _execute(.clear, over: range)
+  }
+
+  public mutating func clear(_ range: ClosedRange<Int>) {
+    _execute(.clear, over: range.lowerBound..<range.upperBound + 1)
+  }
+
+  public mutating func clear(_ index: Int) {
+    _execute(.clear, at: index)
+  }
+
+  public mutating func flip(_ range: Range<Int>? = nil) {
+    _execute(.flip, over: range)
+  }
+
+  public mutating func flip(_ range: ClosedRange<Int>) {
+    _execute(.flip, over: range.lowerBound..<range.upperBound + 1)
+  }
+
+  public mutating func flip(_ index: Int) {
+    _execute(.flip, at: index)
   }
 }
 
@@ -261,24 +333,11 @@ extension BitArray : Collection {
   public func index(after i: Int) -> Int {
     return i + 1
   }
-
   public func formIndex(after i: inout Int) {
     i += 1
   }
 
-  public func contains(_ bit: Bit) -> Bool {
-    return contains(bit, in: 0..<count)
-  }
-
   //TODO: Implement a more efficient `elementsEqual`
-
-  public func index(of bit: Bit) -> Int? {
-    return index(of: bit, in: 0..<count)
-  }
-
-  public func lastIndex(of bit: Bit) -> Int? {
-    return lastIndex(of: bit, in: 0..<count)
-  }
 }
 
 extension BitArray : CustomStringConvertible {
@@ -287,7 +346,7 @@ extension BitArray : CustomStringConvertible {
   }
 }
 
-/*
+
 // MARK: Bitwise operations
 public func & (lhs: BitArray, rhs: BitArray) -> BitArray {
   precondition(lhs.count == rhs.count)
@@ -298,14 +357,12 @@ public func & (lhs: BitArray, rhs: BitArray) -> BitArray {
   return BitArray(words: l, count: lhs.count)
 }
 
-/*
 public func &= (lhs: inout BitArray, rhs: BitArray) {
   precondition(lhs.count == rhs.count)
   for i in 0..<lhs.words.count {
     lhs.words[i] &= rhs.words[i]
   }
 }
-*/
 
 public func | (lhs: BitArray, rhs: BitArray) -> BitArray {
   precondition(lhs.count == rhs.count)
@@ -316,14 +373,12 @@ public func | (lhs: BitArray, rhs: BitArray) -> BitArray {
   return BitArray(words: l, count: lhs.count)
 }
 
-/*
 public func |= (lhs: inout BitArray, rhs: BitArray) {
   precondition(lhs.count == rhs.count)
   for i in 0..<lhs.words.count {
     lhs.words[i] |= rhs.words[i]
   }
 }
-*/
 
 public func ^ (lhs: BitArray, rhs: BitArray) -> BitArray {
   precondition(lhs.count == rhs.count)
@@ -334,15 +389,12 @@ public func ^ (lhs: BitArray, rhs: BitArray) -> BitArray {
   return BitArray(words: l, count: lhs.count)
 }
 
-/*
 public func ^= (lhs: inout BitArray, rhs: BitArray) {
   precondition(lhs.count == rhs.count)
   for i in 0..<lhs.words.count {
     lhs.words[i] ^= rhs.words[i]
   }
 }
-*/
-*/
 
 public prefix func ~ (x: BitArray) -> BitArray {
   var x = x
