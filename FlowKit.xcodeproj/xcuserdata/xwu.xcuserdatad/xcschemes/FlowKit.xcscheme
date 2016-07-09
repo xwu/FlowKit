@@ -37,11 +37,6 @@
                BlueprintName = "FlowKitTests"
                ReferencedContainer = "container:FlowKit.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "BitArrayTests/testBitArrayPerformance()">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
