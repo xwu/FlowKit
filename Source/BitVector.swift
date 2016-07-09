@@ -222,18 +222,18 @@ public struct BitVector {
     return nil
   }
 
-  public mutating func set(_ range: Range<Int>? = nil) {
-    let x: Range<Int>
-    if let range = range {
-      precondition(range.lowerBound >= 0 && range.upperBound <= count)
-      x = range
-    } else {
-      x = 0..<count
-    }
-    guard x.count > 0 else { return }
+  internal func _sanitized(_ bounds: Range<Int>?) -> Range<Int> {
+    guard let bounds = bounds else { return 0..<count }
+    precondition(bounds.lowerBound >= 0 && bounds.upperBound <= count)
+    return bounds
+  }
 
-    let (a, b) = BitVector._offsets(for: x)
-    let (m0, m1) = BitVector._masks(for: x)
+  public mutating func set(_ bounds: Range<Int>? = nil) {
+    let bounds = _sanitized(bounds)
+    guard bounds.count > 0 else { return }
+    let (a, b) = BitVector._offsets(for: bounds)
+    let (m0, m1) = BitVector._masks(for: bounds)
+
     if a == b - 1 {
       buckets[a] |= (m0 & m1)
     } else {
@@ -243,29 +243,23 @@ public struct BitVector {
     }
   }
 
-  public mutating func set(_ range: ClosedRange<Int>) {
-    set(range.lowerBound..<range.upperBound + 1)
+  public mutating func set(_ bounds: ClosedRange<Int>) {
+    set(bounds.lowerBound..<bounds.upperBound + 1)
   }
 
-  public mutating func set(_ index: Int) {
-    precondition(index >= 0 && index < count)
-    let offset = BitVector._offset(for: index)
-    let mask = BitVector._mask(for: index)
+  public mutating func set(_ position: Int) {
+    precondition(position >= 0 && position < count)
+    let offset = BitVector._offset(for: position)
+    let mask = BitVector._mask(for: position)
     buckets[offset] |= mask
   }
 
-  public mutating func clear(_ range: Range<Int>? = nil) {
-    let x: Range<Int>
-    if let range = range {
-      precondition(range.lowerBound >= 0 && range.upperBound <= count)
-      x = range
-    } else {
-      x = 0..<count
-    }
-    guard x.count > 0 else { return }
+  public mutating func clear(_ bounds: Range<Int>? = nil) {
+    let bounds = _sanitized(bounds)
+    guard bounds.count > 0 else { return }
+    let (a, b) = BitVector._offsets(for: bounds)
+    let (m0, m1) = BitVector._masks(for: bounds)
 
-    let (a, b) = BitVector._offsets(for: x)
-    let (m0, m1) = BitVector._masks(for: x)
     if a == b - 1 {
       buckets[a] &= ~(m0 & m1)
     } else {
@@ -275,29 +269,23 @@ public struct BitVector {
     }
   }
 
-  public mutating func clear(_ range: ClosedRange<Int>) {
-    clear(range.lowerBound..<range.upperBound + 1)
+  public mutating func clear(_ bounds: ClosedRange<Int>) {
+    clear(bounds.lowerBound..<bounds.upperBound + 1)
   }
 
-  public mutating func clear(_ index: Int) {
-    precondition(index >= 0 && index < count)
-    let offset = BitVector._offset(for: index)
-    let mask = BitVector._mask(for: index)
+  public mutating func clear(_ position: Int) {
+    precondition(position >= 0 && position < count)
+    let offset = BitVector._offset(for: position)
+    let mask = BitVector._mask(for: position)
     buckets[offset] &= ~mask
   }
 
-  public mutating func flip(_ range: Range<Int>? = nil) {
-    let x: Range<Int>
-    if let range = range {
-      precondition(range.lowerBound >= 0 && range.upperBound <= count)
-      x = range
-    } else {
-      x = 0..<count
-    }
-    guard x.count > 0 else { return }
+  public mutating func flip(_ bounds: Range<Int>? = nil) {
+    let bounds = _sanitized(bounds)
+    guard bounds.count > 0 else { return }
+    let (a, b) = BitVector._offsets(for: bounds)
+    let (m0, m1) = BitVector._masks(for: bounds)
 
-    let (a, b) = BitVector._offsets(for: x)
-    let (m0, m1) = BitVector._masks(for: x)
     if a == b - 1 {
       let mask = m0 & m1
       buckets[a] = (buckets[a] & ~mask) | (~buckets[a] & mask)
@@ -308,14 +296,14 @@ public struct BitVector {
     }
   }
 
-  public mutating func flip(_ range: ClosedRange<Int>) {
-    flip(range.lowerBound..<range.upperBound + 1)
+  public mutating func flip(_ bounds: ClosedRange<Int>) {
+    flip(bounds.lowerBound..<bounds.upperBound + 1)
   }
 
-  public mutating func flip(_ index: Int) {
-    precondition(index >= 0 && index < count)
-    let offset = BitVector._offset(for: index)
-    let mask = BitVector._mask(for: index)
+  public mutating func flip(_ position: Int) {
+    precondition(position >= 0 && position < count)
+    let offset = BitVector._offset(for: position)
+    let mask = BitVector._mask(for: position)
     buckets[offset] = (buckets[offset] & ~mask) | (~buckets[offset] & mask)
   }
 }
