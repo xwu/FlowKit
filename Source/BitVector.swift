@@ -246,14 +246,14 @@ public struct BitVector {
     return nil
   }
 
-  internal func _sanitized(_ bounds: Range<Int>?) -> Range<Int> {
+  internal func _bounds(sanitizing bounds: Range<Int>?) -> Range<Int> {
     guard let bounds = bounds else { return 0..<count }
     precondition(bounds.lowerBound >= 0 && bounds.upperBound <= count)
     return bounds
   }
 
   public mutating func set(_ bounds: Range<Int>? = nil) {
-    let bounds = _sanitized(bounds)
+    let bounds = _bounds(sanitizing: bounds)
     guard bounds.count > 0 else { return }
     let (a, b) = BitVector._offsets(for: bounds)
     let (m0, m1) = BitVector._masks(for: bounds)
@@ -279,7 +279,7 @@ public struct BitVector {
   }
 
   public mutating func clear(_ bounds: Range<Int>? = nil) {
-    let bounds = _sanitized(bounds)
+    let bounds = _bounds(sanitizing: bounds)
     guard bounds.count > 0 else { return }
     let (a, b) = BitVector._offsets(for: bounds)
     let (m0, m1) = BitVector._masks(for: bounds)
@@ -305,7 +305,7 @@ public struct BitVector {
   }
 
   public mutating func flip(_ bounds: Range<Int>? = nil) {
-    let bounds = _sanitized(bounds)
+    let bounds = _bounds(sanitizing: bounds)
     guard bounds.count > 0 else { return }
     let (a, b) = BitVector._offsets(for: bounds)
     let (m0, m1) = BitVector._masks(for: bounds)
