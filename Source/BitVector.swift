@@ -70,11 +70,8 @@ internal func << <
   return result
 }
 
-public enum Bit : UInt8, BooleanLiteralConvertible {
+public enum Bit : UInt8 {
   case zero = 0, one
-  public init(booleanLiteral value: Bool) {
-    self = value ? .one : .zero
-  }
 }
 
 public struct BitVector {
@@ -104,6 +101,33 @@ public struct BitVector {
 
   public internal(set) var buckets: [Bucket] = []
   public let count: Int
+
+  public init<S : Sequence where S.Iterator.Element == Bit>(_ s: S) {
+    let raw = s.lazy.map { $0.rawValue }
+    self.init(raw)
+  }
+
+  public init<S : Sequence where S.Iterator.Element == UInt8>(_ s: S) {
+    var count = 0
+    var bucket = 0 as Bucket
+    var buckets = [Bucket]()
+    for element in s {
+      count += 1
+      bucket = (bucket << 1) + UInt32(element)
+      if (count % Bucket._bitWidth) == 0 {
+        buckets.append(bucket)
+        bucket = 0
+      }
+    }
+    let shift =
+      UInt32((Bucket._bitWidth - (count % Bucket._bitWidth)) % Bucket._bitWidth)
+    if shift > 0 {
+      bucket <<= shift
+      buckets.append(bucket)
+    }
+    self.count = count
+    self.buckets = buckets
+  }
 
   public init(buckets: [Bucket], count: Int) {
     precondition(count >= 0)
