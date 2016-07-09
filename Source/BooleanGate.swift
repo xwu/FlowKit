@@ -9,7 +9,7 @@
 import Foundation
 
 public struct BooleanGate: Gate {
-  public enum Operation: Int {
+  public enum Operation {
     case not, and, or, xor
     // Xor is not supported in Gating-ML, but we'll support it
   }

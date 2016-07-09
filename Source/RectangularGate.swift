@@ -11,24 +11,24 @@ import Foundation
 public struct RectangularGate : Gate {
   public let dimensions: [String]
   public let ranges: [Range<Float>]
-  internal let _lowerBounds: [Float]
-  internal let _upperBounds: [Float]
 
   public init(dimensions: [String], ranges: [Range<Float>]) {
     precondition(dimensions.count == ranges.count)
     self.dimensions = dimensions
     self.ranges = ranges
-    _lowerBounds = ranges.map { $0.lowerBound }
-    _upperBounds = ranges.map { $0.upperBound }
   }
 
   public func masking(_ population: Population) -> Population? {
-    var mask = BitVector(repeating: .one, count: population.root.count)
-    for (i, d) in dimensions.enumerated() {
-      guard let values = population.root.events[d] else { return nil }
-      let l = _lowerBounds[i]
-      let u = _upperBounds[i]
-      mask &= BitVector(values.lazy.map { $0 >= l && $0 < u ? 1 as UInt8 : 0 })
+    let f: @noescape (Int, String?) -> BitVector? = { i, d in
+      guard let d = d, values = population.root.events[d] else { return nil }
+      let (l, u) = (self.ranges[i].lowerBound, self.ranges[i].upperBound)
+      return BitVector(values.lazy.map { $0 >= l && $0 < u ? 1 as UInt8 : 0 })
+    }
+
+    guard var mask = f(0, dimensions.first) else { return nil }
+    for (i, d) in dimensions.enumerated().dropFirst() {
+      guard let m = f(i, d) else { return nil }
+      mask &= m
     }
     return Population(population, mask: mask)
   }

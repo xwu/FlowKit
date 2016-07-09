@@ -13,18 +13,31 @@ public final class Population {
   public let mask: BitVector?
   public let count: Int
   /*
-  public var events: [String : [Float]] {
-    return [String : [Float]]()
+  public typealias _Events =
+    LazyMapSequence<LazyFilterSequence<EnumeratedSequence<[Float]>>, Float>
+  public var events: [String : _Events]? {
+    guard let mask = mask else { return nil }
+    var e = [String : _Events]()
+    root.events.forEach { k, v in
+      e[k] = v.enumerated().lazy.filter { i, _ in mask[i] == .one }.map { $1 }
+    }
+    return e
   }
   */
 
   public init(_ root: Sample, mask: BitVector? = nil) {
+    if let mask = mask {
+      precondition(root.count == mask.count)
+    }
     self.root = root
     self.mask = mask
     count = mask?.cardinality() ?? root.count
   }
 
   public init(_ parent: Population, mask: BitVector? = nil) {
+    if let mask = mask {
+      precondition(parent.root.count == mask.count)
+    }
     self.root = parent.root
     let m: BitVector?
     switch (parent.mask, mask) {
