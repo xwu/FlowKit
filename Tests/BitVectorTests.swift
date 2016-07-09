@@ -1,5 +1,5 @@
 //
-//  BitArrayTests.swift
+//  BitVectorTests.swift
 //  FlowKit
 //
 //  Created by Xiaodi Wu on 7/3/16.
@@ -9,7 +9,7 @@
 import XCTest
 @testable import FlowKit
 
-class BitArrayTests: XCTestCase {
+class BitVectorTests: XCTestCase {
 /*
   override func setUp() {
     super.setUp()
@@ -23,14 +23,14 @@ class BitArrayTests: XCTestCase {
     super.tearDown()
   }
 */
-  func testBitArray() {
-    let b = BitArray(repeating: .one, count: 12)
+  func testBitVector() {
+    let b = BitVector(repeating: .one, count: 12)
     XCTAssertEqual("\(b)", "111111111111")
     XCTAssertEqual(b.count, 12)
     XCTAssertEqual(b.cardinality(), 12)
     let c = ~b
     XCTAssertEqual(c.cardinality(), 0)
-    var d = BitArray(count: 12)
+    var d = BitVector(count: 12)
     XCTAssertEqual(d.cardinality(), 0)
     d.set(0...2)
     XCTAssertEqual(d.cardinality(), 3)
@@ -56,9 +56,9 @@ class BitArrayTests: XCTestCase {
     XCTAssertEqual(d.cardinality(), 0)
   }
 
-  func testBitArrayPerformance() {
-    var x = BitArray(repeating: .zero, count: 1_000_000)
-    var y = BitArray(repeating: .zero, count: 1_000_000)
+  func testBitVectorPerformance() {
+    var x = BitVector(repeating: .zero, count: 1_000_000)
+    var y = BitVector(repeating: .zero, count: 1_000_000)
     for _ in 0..<4000 {
       x.set(Int(floor(drand48() * 1_000_000)))
       y.set(Int(floor(drand48() * 1_000_000)))
