@@ -52,11 +52,24 @@ class BitVectorTests: XCTestCase {
     d.set(11)
     XCTAssertEqual(d.index(of: .zero), 3)
     XCTAssertEqual(d.lastIndex(of: .zero), 10)
+    XCTAssertEqual("\(d[0..<12])", "\(d)")
     d.clear()
     XCTAssertEqual(d.cardinality(), 0)
   }
 
-  func testBitVectorPerformance() {
+  func testBitVectorInitWithUInt8ArrayPerformance() {
+    var x = [UInt8]()
+    x.reserveCapacity(10_000_000)
+    for _ in 0..<10_000_000 {
+      x.append(drand48() > 0.5 ? 1 : 0)
+    }
+    self.measure {
+      let y = BitVector(x)
+      print(y[42])
+    }
+  }
+
+  func testBitVectorBitwiseAndPerformance() {
     var x = BitVector(repeating: .zero, count: 1_000_000)
     var y = BitVector(repeating: .zero, count: 1_000_000)
     for _ in 0..<4000 {
@@ -65,6 +78,24 @@ class BitVectorTests: XCTestCase {
     }
     self.measure {
       let z = x & y
+      print(z[42])
+    }
+  }
+
+  func testBytewiseAndPerformance() {
+    var x = [UInt8](), y = [UInt8]()
+    x.reserveCapacity(1_000_000)
+    y.reserveCapacity(1_000_000)
+    for _ in 0..<1_000_000 {
+      x.append(drand48() > 0.5 ? 1 : 0)
+      y.append(drand48() > 0.5 ? 1 : 0)
+    }
+    self.measure {
+      var z = [UInt8]()
+      z.reserveCapacity(1_000_000)
+      for i in 0..<x.count {
+        z.append(x[i] & y[i])
+      }
       print(z[42])
     }
   }

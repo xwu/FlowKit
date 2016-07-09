@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		854A7D981D31851500FC4681 /* GateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854A7D971D31851500FC4681 /* GateTests.swift */; };
 		855AE2101D1737C000A87EE1 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE20F1D1737C000A87EE1 /* Transform.swift */; };
 		855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2111D174AFC00A87EE1 /* LinearTransform.swift */; };
 		855AE2141D17509D00A87EE1 /* LogTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2131D17509D00A87EE1 /* LogTransform.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		854A7D971D31851500FC4681 /* GateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GateTests.swift; sourceTree = "<group>"; };
 		855AE20F1D1737C000A87EE1 /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transform.swift; sourceTree = "<group>"; };
 		855AE2111D174AFC00A87EE1 /* LinearTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearTransform.swift; sourceTree = "<group>"; };
 		855AE2131D17509D00A87EE1 /* LogTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogTransform.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				85C6DE611D17291D00F34E13 /* CompensationTests.swift */,
 				855AE2171D175AF300A87EE1 /* TransformTests.swift */,
 				85C208F01D28E871001031D8 /* BitVectorTests.swift */,
+				854A7D971D31851500FC4681 /* GateTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				854A7D981D31851500FC4681 /* GateTests.swift in Sources */,
 				855AE2181D175AF300A87EE1 /* TransformTests.swift in Sources */,
 				85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */,
 				85C6DE621D17291D00F34E13 /* CompensationTests.swift in Sources */,

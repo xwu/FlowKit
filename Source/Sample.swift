@@ -81,6 +81,30 @@ public final class Sample {
     events = sample.events
   }
 
+  // For testing purposes only
+  internal init(_ sample: Sample, _times n: Int) {
+    header = sample.header
+    keywords = sample.keywords
+    parameters = sample.parameters
+
+    var r = sample._rawEvents
+    var e = sample.events
+    r.reserveCapacity(sample._rawEvents.count * n)
+    for k in e.keys {
+      e[k]!.reserveCapacity(sample.count * n)
+    }
+    for _ in 1..<n {
+      r.append(contentsOf: sample._rawEvents)
+      for k in e.keys {
+        e[k]!.append(contentsOf: sample.events[k]!)
+      }
+    }
+
+    _rawEvents = r
+    count = sample.count * n
+    events = e
+  }
+
   public init?(
     _ data: Data, offset: Int = 0, options: ReadingOptions = .transform
   ) {

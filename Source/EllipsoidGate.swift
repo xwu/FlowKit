@@ -103,7 +103,9 @@ public struct EllipsoidGate : Gate {
     // Multiply c and b element-wise
     vDSP_vmul(&c, 1, &b, 1, &b, 1, UInt(dc * ec))
     // Sum elements of b row-wise; we'll reuse c for storage
+    /*
     c.removeLast((dc - 1) * ec)
+    */
     for i in 0..<ec {
       var sum = 0 as Float
       for j in 0..<dc {
@@ -112,8 +114,11 @@ public struct EllipsoidGate : Gate {
       c[i] = sum
     }
 
-    let ds = distanceSquared
-    let mask = BitVector(c.lazy.map { $0 <= ds ? 1 as UInt8 : 0 })
+    var result = [UInt8](repeating: 0, count: ec)
+    vDSP_vlim(c, 1, [distanceSquared.nextUp], [-1 as Float], &b, 1, UInt(ec))
+    vDSP_vthres(b, 1, [0 as Float], &c, 1, UInt(ec))
+    vDSP_vfixu8(c, 1, &result, 1, UInt(ec))
+    let mask = BitVector(result)
     return Population(population, mask: mask)
   }
 }

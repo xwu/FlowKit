@@ -55,7 +55,9 @@ internal func << <
   where T.Iterator.Element == UInt32, T.IndexDistance == Int
 >(lhs: T, rhs: Int) -> [UInt32] {
   precondition(rhs >= 0 && rhs < 32)
-  let shift0 = UInt32(rhs % 32)
+  if rhs == 0 { return [UInt32](lhs) }
+
+  let shift0 = UInt32(rhs)
   let mask = ~(UInt32.max >> shift0)
   let shift1 = 32 - shift0
 
@@ -75,7 +77,6 @@ public enum Bit : UInt8 {
 }
 
 public struct BitVector {
-  //TODO: Once revised BinaryInteger protocols have landed, switch to `UInt`
   public typealias Bucket = UInt32
 
   internal static func _offset(for index: Int) -> Int {
@@ -103,29 +104,31 @@ public struct BitVector {
   public let count: Int
 
   public init<S : Sequence where S.Iterator.Element == Bit>(_ s: S) {
-    let raw = s.lazy.map { $0.rawValue }
+    let raw = s.map { $0.rawValue }
     self.init(raw)
   }
 
-  public init<S : Sequence where S.Iterator.Element == UInt8>(_ s: S) {
-    var count = 0
-    var bucket = 0 as Bucket
+  public init(_ a: [UInt8]) {
+    self.count = a.count
+    
     var buckets = [Bucket]()
-    for element in s {
-      count += 1
-      bucket = (bucket << 1) + UInt32(element)
-      if (count % Bucket._bitWidth) == 0 {
-        buckets.append(bucket)
-        bucket = 0
+    let capacity = (a.count + Bucket._bitWidth - 1) / Bucket._bitWidth
+    buckets.reserveCapacity(capacity)
+
+    for i in 0..<(capacity - 1) {
+      let offset = i * Bucket._bitWidth
+      var bucket = 0 as Bucket
+      for j in 0..<Bucket._bitWidth {
+        bucket |= Bucket(a[offset + j] % 2) << Bucket(Bucket._bitWidth - j - 1)
       }
-    }
-    let shift =
-      UInt32((Bucket._bitWidth - (count % Bucket._bitWidth)) % Bucket._bitWidth)
-    if shift > 0 {
-      bucket <<= shift
       buckets.append(bucket)
     }
-    self.count = count
+    let offset = (capacity - 1) * Bucket._bitWidth
+    var bucket = 0 as Bucket
+    for j in 0..<(a.count % Bucket._bitWidth) {
+      bucket |= Bucket(a[offset + j] % 2) << Bucket(Bucket._bitWidth - j - 1)
+    }
+    buckets.append(bucket)
     self.buckets = buckets
   }
 
