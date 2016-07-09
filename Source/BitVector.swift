@@ -198,17 +198,13 @@ public struct BitVector {
       for b in buckets {
         let clz = (~b)._leadingZeros
         v += clz
-        if clz < Bucket._bitWidth {
-          return v < count ? v : nil
-        }
+        if clz < Bucket._bitWidth { return v < count ? v : nil }
       }
     case .one:
       for b in buckets {
         let clz = b._leadingZeros
         v += clz
-        if clz < Bucket._bitWidth {
-          return v
-        }
+        if clz < Bucket._bitWidth { return v }
       }
     }
     return nil
@@ -223,24 +219,18 @@ public struct BitVector {
       if let b = buckets.last {
         let ctz = (~b & (Bucket.max << Bucket(shift)))._trailingZeros
         v -= ctz
-        if ctz < Bucket._bitWidth {
-          return v
-        }
+        if ctz < Bucket._bitWidth { return v }
       }
       for b in buckets.dropLast().reversed() {
         let ctz = (~b)._trailingZeros
         v -= ctz
-        if ctz < Bucket._bitWidth {
-          return v
-        }
+        if ctz < Bucket._bitWidth { return v }
       }
     case .one:
       for b in buckets.reversed() {
         let ctz = b._trailingZeros
         v -= ctz
-        if ctz < Bucket._bitWidth {
-          return v
-        }
+        if ctz < Bucket._bitWidth { return v }
       }
     }
     return nil
