@@ -32,7 +32,8 @@ public struct BooleanGate: Gate {
     guard var mask = gates.first?.masking(population)?.mask else { return nil }
     switch operation {
     case .not:
-      // A not gate can only reference one other gate
+      // Each not gate can only reference one other gate
+      // Note that we must mask the parent population and not the root sample
       return Population(population, mask: ~mask)
     case .and:
       for gate in gates.dropFirst() {
