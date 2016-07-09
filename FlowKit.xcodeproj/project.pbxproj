@@ -14,6 +14,9 @@
 		855AE2181D175AF300A87EE1 /* TransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2171D175AF300A87EE1 /* TransformTests.swift */; };
 		856825701D30C6A700556D92 /* Population.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8568256F1D30C6A700556D92 /* Population.swift */; };
 		856825721D30CA0400556D92 /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856825711D30CA0400556D92 /* Gate.swift */; };
+		856825741D30D38A00556D92 /* RectangularGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856825731D30D38A00556D92 /* RectangularGate.swift */; };
+		856825761D30D3AF00556D92 /* EllipsoidGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856825751D30D3AF00556D92 /* EllipsoidGate.swift */; };
+		856825781D30D3E100556D92 /* BooleanGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856825771D30D3E100556D92 /* BooleanGate.swift */; };
 		8592A0431D18852E001EDB65 /* LogicleTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8592A0421D18852E001EDB65 /* LogicleTransform.swift */; };
 		85C208EF1D28DFB0001031D8 /* BitVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208EE1D28DFB0001031D8 /* BitVector.swift */; };
 		85C208F11D28E871001031D8 /* BitVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208F01D28E871001031D8 /* BitVectorTests.swift */; };
@@ -46,6 +49,9 @@
 		855AE2171D175AF300A87EE1 /* TransformTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformTests.swift; path = Tests/TransformTests.swift; sourceTree = SOURCE_ROOT; };
 		8568256F1D30C6A700556D92 /* Population.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Population.swift; sourceTree = "<group>"; };
 		856825711D30CA0400556D92 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gate.swift; sourceTree = "<group>"; };
+		856825731D30D38A00556D92 /* RectangularGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RectangularGate.swift; sourceTree = "<group>"; };
+		856825751D30D3AF00556D92 /* EllipsoidGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EllipsoidGate.swift; sourceTree = "<group>"; };
+		856825771D30D3E100556D92 /* BooleanGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BooleanGate.swift; sourceTree = "<group>"; };
 		8592A0421D18852E001EDB65 /* LogicleTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogicleTransform.swift; sourceTree = "<group>"; };
 		85C208EE1D28DFB0001031D8 /* BitVector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitVector.swift; sourceTree = "<group>"; };
 		85C208F01D28E871001031D8 /* BitVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitVectorTests.swift; path = Tests/BitVectorTests.swift; sourceTree = SOURCE_ROOT; };
@@ -118,6 +124,9 @@
 				85C208EE1D28DFB0001031D8 /* BitVector.swift */,
 				8568256F1D30C6A700556D92 /* Population.swift */,
 				856825711D30CA0400556D92 /* Gate.swift */,
+				856825731D30D38A00556D92 /* RectangularGate.swift */,
+				856825751D30D3AF00556D92 /* EllipsoidGate.swift */,
+				856825771D30D3E100556D92 /* BooleanGate.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -271,10 +280,13 @@
 				856825701D30C6A700556D92 /* Population.swift in Sources */,
 				855AE2161D1755F100A87EE1 /* AsinhTransform.swift in Sources */,
 				85C5CB9B1D15C10600FF5367 /* Sample.swift in Sources */,
+				856825781D30D3E100556D92 /* BooleanGate.swift in Sources */,
 				855AE2101D1737C000A87EE1 /* Transform.swift in Sources */,
 				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
 				855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */,
 				856825721D30CA0400556D92 /* Gate.swift in Sources */,
+				856825741D30D38A00556D92 /* RectangularGate.swift in Sources */,
+				856825761D30D3AF00556D92 /* EllipsoidGate.swift in Sources */,
 				8592A0431D18852E001EDB65 /* LogicleTransform.swift in Sources */,
 				855AE2141D17509D00A87EE1 /* LogTransform.swift in Sources */,
 				85C208EF1D28DFB0001031D8 /* BitVector.swift in Sources */,
