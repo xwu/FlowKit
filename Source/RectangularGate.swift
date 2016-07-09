@@ -19,16 +19,15 @@ public struct RectangularGate : Gate {
   }
 
   public func masking(_ population: Population) -> Population? {
-    let f: @noescape (Int, String?) -> BitVector? = { i, d in
-      guard let d = d, values = population.root.events[d] else { return nil }
-      let (l, u) = (self.ranges[i].lowerBound, self.ranges[i].upperBound)
-      return BitVector(values.lazy.map { $0 >= l && $0 < u ? 1 as UInt8 : 0 })
-    }
-
-    guard var mask = f(0, dimensions.first) else { return nil }
+    guard
+      let d0 = dimensions.first, values = population.root.events[d0],
+      l = ranges.first?.lowerBound, u = ranges.first?.upperBound
+      else { return nil }
+    var mask = BitVector(values.lazy.map { $0 >= l && $0 < u ? 1 as UInt8 : 0 })
     for (i, d) in dimensions.enumerated().dropFirst() {
-      guard let m = f(i, d) else { return nil }
-      mask &= m
+      guard let values = population.root.events[d] else { return nil }
+      let l = ranges[i].lowerBound, u = ranges[i].upperBound
+      mask &= BitVector(values.lazy.map { $0 >= l && $0 < u ? 1 as UInt8 : 0 })
     }
     return Population(population, mask: mask)
   }

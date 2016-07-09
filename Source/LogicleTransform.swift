@@ -85,7 +85,7 @@ public struct LogicleTransform : Transform {
     _e = sinh(M * log(10)) / T
     _b = (M + A) * log(10)
 
-    let solve: @noescape (Double, Double) -> Double? = { b, w in
+    func solve(_ b: Double, _ w: Double) -> Double? {
       // If `w == 0`, then it's really asinh
       if w == 0 { return b }
       // Precision is the same as that of `b`
