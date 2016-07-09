@@ -1,5 +1,5 @@
 //
-//  BitArray.swift
+//  BitVector.swift
 //  FlowKit
 //
 //  Created by Xiaodi Wu on 7/3/16.
@@ -77,7 +77,7 @@ public enum Bit : UInt8, BooleanLiteralConvertible {
   }
 }
 
-public struct BitArray {
+public struct BitVector {
   //TODO: Once revised BinaryInteger protocols have landed, switch to `UInt`
   public typealias Bucket = UInt32
 
@@ -122,7 +122,7 @@ public struct BitArray {
     assert(self.buckets.count == f)
 
     // Various methods assume bits past `count` are zero
-    let (_, mask) = BitArray._masks(for: 0..<count)
+    let (_, mask) = BitVector._masks(for: 0..<count)
     if let last = self.buckets.last where last != (last & mask) {
       self.buckets[self.buckets.endIndex - 1] = (last & mask)
     }
@@ -137,7 +137,7 @@ public struct BitArray {
     buckets = [Bucket](repeating: rv, count: bc)
 
     // Various methods assume bits past `count` are zero
-    let (_, mask) = BitArray._masks(for: 0..<count)
+    let (_, mask) = BitVector._masks(for: 0..<count)
     if let last = buckets.last where last != (last & mask) {
       buckets[buckets.endIndex - 1] = (last & mask)
     }
@@ -145,16 +145,16 @@ public struct BitArray {
 
   public subscript(_ position: Int) -> Bit {
     precondition(position >= 0 && position < count)
-    let offset = BitArray._offset(for: position)
-    let mask = BitArray._mask(for: position)
+    let offset = BitVector._offset(for: position)
+    let mask = BitVector._mask(for: position)
     return ((buckets[offset] & mask) == 0) ? .zero : .one
   }
 
-  public subscript(_ bounds: Range<Int>) -> BitArray {
+  public subscript(_ bounds: Range<Int>) -> BitVector {
     precondition(bounds.lowerBound >= 0 && bounds.upperBound <= count)
-    let (a, b) = BitArray._offsets(for: bounds)
+    let (a, b) = BitVector._offsets(for: bounds)
     let shift = bounds.lowerBound % Bucket._bitWidth
-    return BitArray(buckets: buckets[a..<b] << shift, count: bounds.count)
+    return BitVector(buckets: buckets[a..<b] << shift, count: bounds.count)
   }
 
   public func cardinality() -> Int {
@@ -232,8 +232,8 @@ public struct BitArray {
     }
     guard x.count > 0 else { return }
 
-    let (a, b) = BitArray._offsets(for: x)
-    let (m0, m1) = BitArray._masks(for: x)
+    let (a, b) = BitVector._offsets(for: x)
+    let (m0, m1) = BitVector._masks(for: x)
     if a == b - 1 {
       buckets[a] |= (m0 & m1)
     } else {
@@ -249,8 +249,8 @@ public struct BitArray {
 
   public mutating func set(_ index: Int) {
     precondition(index >= 0 && index < count)
-    let offset = BitArray._offset(for: index)
-    let mask = BitArray._mask(for: index)
+    let offset = BitVector._offset(for: index)
+    let mask = BitVector._mask(for: index)
     buckets[offset] |= mask
   }
 
@@ -264,8 +264,8 @@ public struct BitArray {
     }
     guard x.count > 0 else { return }
 
-    let (a, b) = BitArray._offsets(for: x)
-    let (m0, m1) = BitArray._masks(for: x)
+    let (a, b) = BitVector._offsets(for: x)
+    let (m0, m1) = BitVector._masks(for: x)
     if a == b - 1 {
       buckets[a] &= ~(m0 & m1)
     } else {
@@ -281,8 +281,8 @@ public struct BitArray {
 
   public mutating func clear(_ index: Int) {
     precondition(index >= 0 && index < count)
-    let offset = BitArray._offset(for: index)
-    let mask = BitArray._mask(for: index)
+    let offset = BitVector._offset(for: index)
+    let mask = BitVector._mask(for: index)
     buckets[offset] &= ~mask
   }
 
@@ -296,8 +296,8 @@ public struct BitArray {
     }
     guard x.count > 0 else { return }
 
-    let (a, b) = BitArray._offsets(for: x)
-    let (m0, m1) = BitArray._masks(for: x)
+    let (a, b) = BitVector._offsets(for: x)
+    let (m0, m1) = BitVector._masks(for: x)
     if a == b - 1 {
       let mask = m0 & m1
       buckets[a] = (buckets[a] & ~mask) | (~buckets[a] & mask)
@@ -314,13 +314,13 @@ public struct BitArray {
 
   public mutating func flip(_ index: Int) {
     precondition(index >= 0 && index < count)
-    let offset = BitArray._offset(for: index)
-    let mask = BitArray._mask(for: index)
+    let offset = BitVector._offset(for: index)
+    let mask = BitVector._mask(for: index)
     buckets[offset] = (buckets[offset] & ~mask) | (~buckets[offset] & mask)
   }
 }
 
-extension BitArray : BidirectionalCollection {
+extension BitVector : BidirectionalCollection {
   public var startIndex: Int { return 0 }
   public var endIndex: Int { return count }
 
@@ -338,62 +338,62 @@ extension BitArray : BidirectionalCollection {
   }
 }
 
-extension BitArray : CustomStringConvertible {
+extension BitVector : CustomStringConvertible {
   public var description: String {
     return self.reduce("") { $0 + String($1.rawValue) }
   }
 }
 
 // MARK: Bitwise operations
-public func & (lhs: BitArray, rhs: BitArray) -> BitArray {
+public func & (lhs: BitVector, rhs: BitVector) -> BitVector {
   precondition(lhs.count == rhs.count)
   var l = lhs.buckets
   for i in 0..<l.count {
     l[i] &= rhs.buckets[i]
   }
-  return BitArray(buckets: l, count: lhs.count)
+  return BitVector(buckets: l, count: lhs.count)
 }
 
-public func &= (lhs: inout BitArray, rhs: BitArray) {
+public func &= (lhs: inout BitVector, rhs: BitVector) {
   precondition(lhs.count == rhs.count)
   for i in 0..<lhs.buckets.count {
     lhs.buckets[i] &= rhs.buckets[i]
   }
 }
 
-public func | (lhs: BitArray, rhs: BitArray) -> BitArray {
+public func | (lhs: BitVector, rhs: BitVector) -> BitVector {
   precondition(lhs.count == rhs.count)
   var l = lhs.buckets
   for i in 0..<l.count {
     l[i] |= rhs.buckets[i]
   }
-  return BitArray(buckets: l, count: lhs.count)
+  return BitVector(buckets: l, count: lhs.count)
 }
 
-public func |= (lhs: inout BitArray, rhs: BitArray) {
+public func |= (lhs: inout BitVector, rhs: BitVector) {
   precondition(lhs.count == rhs.count)
   for i in 0..<lhs.buckets.count {
     lhs.buckets[i] |= rhs.buckets[i]
   }
 }
 
-public func ^ (lhs: BitArray, rhs: BitArray) -> BitArray {
+public func ^ (lhs: BitVector, rhs: BitVector) -> BitVector {
   precondition(lhs.count == rhs.count)
   var l = lhs.buckets
   for i in 0..<l.count {
     l[i] ^= rhs.buckets[i]
   }
-  return BitArray(buckets: l, count: lhs.count)
+  return BitVector(buckets: l, count: lhs.count)
 }
 
-public func ^= (lhs: inout BitArray, rhs: BitArray) {
+public func ^= (lhs: inout BitVector, rhs: BitVector) {
   precondition(lhs.count == rhs.count)
   for i in 0..<lhs.buckets.count {
     lhs.buckets[i] ^= rhs.buckets[i]
   }
 }
 
-public prefix func ~ (x: BitArray) -> BitArray {
+public prefix func ~ (x: BitVector) -> BitVector {
   var x = x
   x.flip()
   return x
