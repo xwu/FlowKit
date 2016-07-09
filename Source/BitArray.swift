@@ -78,6 +78,7 @@ public enum Bit : UInt8, BooleanLiteralConvertible {
 }
 
 public struct BitArray {
+  //TODO: Once revised BinaryInteger protocols have landed, switch to `UInt`
   public typealias Bucket = UInt32
 
   internal static func _offset(for index: Int) -> Int {
