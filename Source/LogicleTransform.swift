@@ -40,7 +40,7 @@ import Foundation
 import Accelerate
 
 public struct LogicleTransform : Transform {
-  public static let defaultResolution = 4096
+  public static var defaultResolution = 4096
   public static let taylorPolynomialDegree = 16
 
   public let parameters: _Parameters

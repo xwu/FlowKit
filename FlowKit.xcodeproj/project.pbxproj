@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		854A7D981D31851500FC4681 /* GateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854A7D971D31851500FC4681 /* GateTests.swift */; };
+		855482E71D31DAC50000367D /* PolygonGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855482E61D31DAC50000367D /* PolygonGate.swift */; };
 		855AE2101D1737C000A87EE1 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE20F1D1737C000A87EE1 /* Transform.swift */; };
 		855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2111D174AFC00A87EE1 /* LinearTransform.swift */; };
 		855AE2141D17509D00A87EE1 /* LogTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE2131D17509D00A87EE1 /* LogTransform.swift */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		854A7D971D31851500FC4681 /* GateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GateTests.swift; sourceTree = "<group>"; };
+		855482E61D31DAC50000367D /* PolygonGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolygonGate.swift; sourceTree = "<group>"; };
 		855AE20F1D1737C000A87EE1 /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transform.swift; sourceTree = "<group>"; };
 		855AE2111D174AFC00A87EE1 /* LinearTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearTransform.swift; sourceTree = "<group>"; };
 		855AE2131D17509D00A87EE1 /* LogTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogTransform.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				856825711D30CA0400556D92 /* Gate.swift */,
 				856825731D30D38A00556D92 /* RectangularGate.swift */,
 				856825751D30D3AF00556D92 /* EllipsoidGate.swift */,
+				855482E61D31DAC50000367D /* PolygonGate.swift */,
 				856825771D30D3E100556D92 /* BooleanGate.swift */,
 			);
 			path = Source;
@@ -287,6 +290,7 @@
 				855AE2101D1737C000A87EE1 /* Transform.swift in Sources */,
 				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
 				855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */,
+				855482E71D31DAC50000367D /* PolygonGate.swift in Sources */,
 				856825721D30CA0400556D92 /* Gate.swift in Sources */,
 				856825741D30D38A00556D92 /* RectangularGate.swift in Sources */,
 				856825761D30D3AF00556D92 /* EllipsoidGate.swift in Sources */,

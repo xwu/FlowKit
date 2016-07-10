@@ -67,14 +67,14 @@ class GateTests: XCTestCase {
       ranges: [0..<0.5, 0.2..<0.4]
     )
     // Artificially increase event count
-    let s = Sample(sample, _times: 256)
+    let s = Sample(sample, _times: 64)
     // Test for correctness
     let population = gate.masking(s)!
     XCTAssertEqual("\(population.mask![0..<16])", "1011111000000000")
     // Test performance
     self.measure {
       let population = gate.masking(s)!
-      XCTAssertEqual(population.mask!.count, 6757 * 256)
+      XCTAssertEqual(population.mask!.count, 6757 * 64)
     }
   }
 
@@ -92,14 +92,51 @@ class GateTests: XCTestCase {
       distanceSquared: 0.2
     )
     // Artificially increase event count
-    let s = Sample(sample, _times: 256)
+    let s = Sample(sample, _times: 64)
     // Test for correctness
     let population = gate.masking(s)!
     XCTAssertEqual("\(population.mask![0..<16])", "0000000111111111")
     // Test performance
     self.measure {
       let population = gate.masking(s)!
-      XCTAssertEqual(population.mask!.count, 6757 * 256)
+      XCTAssertEqual(population.mask!.count, 6757 * 64)
+    }
+  }
+
+  func testPolygonGatePerformance() {
+    let testBundle = Bundle(for: SampleTests.self)
+    let url = testBundle.urlForResource("Example", withExtension: "fcs")!
+    let data = try! Data(contentsOf: url)
+    let sample = Sample(data)!
+    /*
+    let transform = LinearTransform()!
+    transform.scale(sample, dimensions: ["FSC-A", "SSC-A"])
+    */
+    let gate = PolygonGate(
+      dimensions: ["FSC-A", "SSC-A"],
+      vertices: [
+        (163, 320), (203, 118), (301, 359), (103, 172),
+        (388, 190), (187, 387), (292, 110)
+      ]
+    )
+    // Artificially increase event count
+    let s = Sample(sample, _times: 64)
+    // Artificially replace events with the following data
+    s.events["FSC-A"]!.replaceSubrange(
+      0..<8,
+      with: [153, 160, 206, 207, 182, 245, 297, 230]
+    )
+    s.events["SSC-A"]!.replaceSubrange(
+      0..<8,
+      with: [141, 205, 206, 167, 269, 199, 234, 324]
+    )
+    // Test for correctness
+    let population = gate.masking(s)!
+    XCTAssertEqual("\(population.mask![0..<8])", "01011011")
+    // Test performance
+    self.measure {
+      let population = gate.masking(s)!
+      XCTAssertEqual(population.mask!.count, 6757 * 64)
     }
   }
 }

@@ -15,6 +15,7 @@ public struct EllipsoidGate : Gate {
   public let covariances: [Float]
   public let distanceSquared: Float
   internal let _lowerTriangle: [Float]?
+
   // The following properties are computed only for two-dimensional gates
   public let halfAxes: (Float, Float)?
   public let rotation: Float?
