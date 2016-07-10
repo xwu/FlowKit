@@ -20,6 +20,8 @@
 		856825761D30D3AF00556D92 /* EllipsoidGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856825751D30D3AF00556D92 /* EllipsoidGate.swift */; };
 		856825781D30D3E100556D92 /* BooleanGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856825771D30D3E100556D92 /* BooleanGate.swift */; };
 		8592A0431D18852E001EDB65 /* LogicleTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8592A0421D18852E001EDB65 /* LogicleTransform.swift */; };
+		85A8F5F21D321AB900271C3D /* Histogram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A8F5F11D321AB900271C3D /* Histogram.swift */; };
+		85A8F5F41D32325000271C3D /* HistogramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A8F5F31D32325000271C3D /* HistogramTests.swift */; };
 		85C208EF1D28DFB0001031D8 /* BitVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208EE1D28DFB0001031D8 /* BitVector.swift */; };
 		85C208F11D28E871001031D8 /* BitVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208F01D28E871001031D8 /* BitVectorTests.swift */; };
 		85C5CB841D15BFBD00FF5367 /* FlowKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 85C5CB831D15BFBD00FF5367 /* FlowKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -57,6 +59,8 @@
 		856825751D30D3AF00556D92 /* EllipsoidGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EllipsoidGate.swift; sourceTree = "<group>"; };
 		856825771D30D3E100556D92 /* BooleanGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BooleanGate.swift; sourceTree = "<group>"; };
 		8592A0421D18852E001EDB65 /* LogicleTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogicleTransform.swift; sourceTree = "<group>"; };
+		85A8F5F11D321AB900271C3D /* Histogram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Histogram.swift; sourceTree = "<group>"; };
+		85A8F5F31D32325000271C3D /* HistogramTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistogramTests.swift; sourceTree = "<group>"; };
 		85C208EE1D28DFB0001031D8 /* BitVector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitVector.swift; sourceTree = "<group>"; };
 		85C208F01D28E871001031D8 /* BitVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitVectorTests.swift; path = Tests/BitVectorTests.swift; sourceTree = SOURCE_ROOT; };
 		85C5CB801D15BFBD00FF5367 /* FlowKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FlowKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -132,6 +136,7 @@
 				856825751D30D3AF00556D92 /* EllipsoidGate.swift */,
 				855482E61D31DAC50000367D /* PolygonGate.swift */,
 				856825771D30D3E100556D92 /* BooleanGate.swift */,
+				85A8F5F11D321AB900271C3D /* Histogram.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -146,6 +151,7 @@
 				855AE2171D175AF300A87EE1 /* TransformTests.swift */,
 				85C208F01D28E871001031D8 /* BitVectorTests.swift */,
 				854A7D971D31851500FC4681 /* GateTests.swift */,
+				85A8F5F31D32325000271C3D /* HistogramTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -289,6 +295,7 @@
 				856825781D30D3E100556D92 /* BooleanGate.swift in Sources */,
 				855AE2101D1737C000A87EE1 /* Transform.swift in Sources */,
 				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
+				85A8F5F21D321AB900271C3D /* Histogram.swift in Sources */,
 				855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */,
 				855482E71D31DAC50000367D /* PolygonGate.swift in Sources */,
 				856825721D30CA0400556D92 /* Gate.swift in Sources */,
@@ -304,6 +311,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85A8F5F41D32325000271C3D /* HistogramTests.swift in Sources */,
 				854A7D981D31851500FC4681 /* GateTests.swift in Sources */,
 				855AE2181D175AF300A87EE1 /* TransformTests.swift in Sources */,
 				85C5CB901D15BFBD00FF5367 /* SampleTests.swift in Sources */,

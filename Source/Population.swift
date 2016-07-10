@@ -12,18 +12,6 @@ public final class Population {
   public let root: Sample
   public let mask: BitVector?
   public let count: Int
-  /*
-  public typealias _Events =
-    LazyMapSequence<LazyFilterSequence<EnumeratedSequence<[Float]>>, Float>
-  public var events: [String : _Events]? {
-    guard let mask = mask else { return nil }
-    var e = [String : _Events]()
-    root.events.forEach { k, v in
-      e[k] = v.enumerated().lazy.filter { i, _ in mask[i] == .one }.map { $1 }
-    }
-    return e
-  }
-  */
 
   public init(_ root: Sample, mask: BitVector? = nil) {
     if let mask = mask {

@@ -222,7 +222,7 @@ public final class Sample {
         else { return nil }
       switch dataType {
       case "D":
-        let size = strideof(Double)
+        let size = strideof(Double.self)
         rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
         if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
@@ -238,7 +238,7 @@ public final class Sample {
           }
         }
       case "F":
-        let size = strideof(Float)
+        let size = strideof(Float.self)
         rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
         if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {

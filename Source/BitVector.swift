@@ -79,6 +79,44 @@ public enum Bit : UInt8 {
 public struct BitVector {
   public typealias Bucket = UInt32
 
+  public static func packing(_ a: [UInt8]) -> [Bucket] {
+    let bw = Bucket._bitWidth, capacity = (a.count + bw - 1) / bw
+    var buckets = [Bucket]()
+    buckets.reserveCapacity(capacity)
+    var bucket = 0 as Bucket
+
+    var i = 0 as Bucket
+    for element in a {
+      bucket <<= 1
+      bucket += Bucket(element % 2)
+      i += 1
+      if i == Bucket(bw) {
+        buckets.append(bucket)
+        bucket = 0
+        i = 0
+      }
+    }
+    if i > 0 {
+      bucket <<= Bucket((bw - (a.count % bw)) % bw)
+      buckets.append(bucket)
+    }
+    return buckets
+  }
+
+  public static func unpacking(_ b: [Bucket], count: Int) -> [UInt8] {
+    let bw = Bucket._bitWidth, msb = Bucket(bw - 1)
+    var a = [UInt8]()
+    a.reserveCapacity(b.count * bw)
+    for var element in b {
+      for _ in 0...msb {
+        a.append(UInt8(element >> msb))
+        element <<= 1
+      }
+    }
+    a.removeLast((bw - (count % bw)) % bw)
+    return a
+  }
+
   internal static func _offset(for index: Int) -> Int {
     return index / Bucket._bitWidth
   }
@@ -110,28 +148,7 @@ public struct BitVector {
 
   public init(_ a: [UInt8]) {
     self.count = a.count
-    
-    let bw = Bucket._bitWidth, capacity = (a.count + bw - 1) / bw
-    var buckets = [Bucket]()
-    buckets.reserveCapacity(capacity)
-    var bucket = 0 as Bucket
-
-    var i = 0 as Bucket
-    for element in a {
-      bucket <<= 1
-      bucket += Bucket(element % 2)
-      i += 1
-      if i == Bucket(bw) {
-        buckets.append(bucket)
-        bucket = 0
-        i = 0
-      }
-    }
-    if i > 0 {
-      bucket <<= Bucket((bw - (a.count % bw)) % bw)
-      buckets.append(bucket)
-    }
-    self.buckets = buckets
+    self.buckets = BitVector.packing(a)
   }
 
   public init(buckets: [Bucket], count: Int) {
