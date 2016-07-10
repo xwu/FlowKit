@@ -420,17 +420,15 @@ public struct LogicleTransform : Transform {
     // SP to DP
     vDSP_vspdp(values, 1, &v4, 1, UInt(v4.count))
     // Compute asinh transform
-    var c = Int32(v4.count), e = _e, ib = 1 / _b, x2 = _x2
-    v4.withUnsafeBufferPointer {
-      vDSP_vsmulD($0.baseAddress!, 1, &e, &v5, 1, UInt(v4.count))
-    }
-    vvasinh(&v6, &v5, &c) // This cannot be done in-place
-    vDSP_vsmsaD(&v6, 1, &ib, &x2, &v6, 1, UInt(v4.count))
+    let c = Int32(v4.count), e = _e, ib = 1 / _b, x2 = _x2
+    vDSP_vsmulD(v4, 1, [e], &v5, 1, UInt(v4.count))
+    vvasinh(&v6, v5, [c]) // This cannot be done in-place
+    vDSP_vsmsaD(v6, 1, [ib], [x2], &v6, 1, UInt(v4.count))
     // Interpolate
-    var s = Double(_resolution), m = UInt(_asinhToLogicleBins.count)
-    vDSP_vtabiD(&v6, 1, &s, &s, _asinhToLogicleBins, m, &v6, 1, UInt(v4.count))
+    let s = Double(_resolution), m = UInt(_asinhToLogicleBins.count)
+    vDSP_vtabiD(v6, 1, [s], [s], _asinhToLogicleBins, m, &v6, 1, UInt(v4.count))
     // DP to SP
-    vDSP_vdpsp(&v6, 1, &v7, 1, UInt(v4.count))
+    vDSP_vdpsp(v6, 1, &v7, 1, UInt(v4.count))
     return clipping(v7)
   }
 
@@ -440,14 +438,15 @@ public struct LogicleTransform : Transform {
     var v0 = clipping(values)
     // SP to DP
     var v1 = [Double](repeating: 0, count: v0.count)
-    vDSP_vspdp(&v0, 1, &v1, 1, UInt(v0.count))
+    vDSP_vspdp(v0, 1, &v1, 1, UInt(v0.count))
     // Find the bin and interpolate linearly
-    var s1 = Double(_resolution), s2 = 0 as Double
+    let s = Double(_resolution)
     vDSP_vtabiD(
-      &v1, 1, &s1, &s2, _bins, UInt(_bins.count), &v1, 1, UInt(v0.count)
+      v1, 1, [s], [0 as Double],
+      _bins, UInt(_bins.count), &v1, 1, UInt(v0.count)
     )
     // DP to SP
-    vDSP_vdpsp(&v1, 1, &v0, 1, UInt(v0.count))
+    vDSP_vdpsp(v1, 1, &v0, 1, UInt(v0.count))
     return v0
   }
 }

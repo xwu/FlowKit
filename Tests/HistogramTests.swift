@@ -48,6 +48,9 @@ class HistogramTests: XCTestCase {
       dimensions: ["FSC-A", "SSC-A"],
       resolution: 32
     )!
-    print(histogram0.data, histogram1.data)
+    // print(histogram0.data, histogram1.data)
+    for i in 0..<32 * 15 {
+      XCTAssertEqual(histogram0.data[i], histogram1.data[i])
+    }
   }
 }
