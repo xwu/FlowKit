@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+	<polygon points="163, 320  203, 118  301, 359  103, 172  388, 190  187, 387  292, 110" fill-rule="evenodd"/>
+	<circle cx="153" cy="141" r="5" fill="red" stroke="black"/>
+	<circle cx="160" cy="205" r="5" fill="green" stroke="white"/>
+	<circle cx="206" cy="206" r="5" fill="red" stroke="black"/>
+	<circle cx="207" cy="167" r="5" fill="green" stroke="white"/>
+	<circle cx="182" cy="269" r="5" fill="green" stroke="white"/>
+	<circle cx="245" cy="199" r="5" fill="red" stroke="black"/>
+	<circle cx="297" cy="234" r="5" fill="green" stroke="white"/>
+	<circle cx="230" cy="324" r="5" fill="green" stroke="white"/>
+</svg>
