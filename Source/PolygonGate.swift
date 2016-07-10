@@ -61,7 +61,6 @@ public struct PolygonGate : Gate {
       // Here, "positive" and "negative" vertices refer to the x-coordinate of
       // the vertex after subtracting the x-coordinate of the point to be
       // interrogated
-
       var isFirstOffAxisVertexFound = false
       var firstOffAxisTest = false
       var skippedVerticesBeforeFirstOffAxisVertex = 0
@@ -77,9 +76,9 @@ public struct PolygonGate : Gate {
         // interrogated
         let pxcy = px * cy, cxpy = cx * py
         let test = (cy < 0.0) != (py < 0.0)
-        // `test == true` if the edge joining the previous vertex to the
-        // current vertex (both minus coordinates of the point to be
-        // interrogated) crosses the x-axis
+        // `test == true` if the edge joining the previous vertex to the current
+        // vertex (both minus coordinates of the point to be interrogated)
+        // crosses the x-axis
 
         // Check collinearity; gives a false negative if (`px`, `py`) or
         // (`cx`, `cy`) is at the origin, but that case is handled below
@@ -146,12 +145,10 @@ public struct PolygonGate : Gate {
         px = cx
         py = cy
       }
-
       if !isFirstOffAxisVertexFound {
         result[idx] = 0
         continue outer
       }
-
       // We've deliberately deferred incrementing or decrementing
       // `intersections` for the first off-axis vertex until now
       if firstOffAxisTest {
@@ -161,7 +158,6 @@ public struct PolygonGate : Gate {
           intersections += 1
         }
       }
-
       // It's an even-odd algorithm, after all...
       result[idx] = UInt8(intersections % 2)
     }

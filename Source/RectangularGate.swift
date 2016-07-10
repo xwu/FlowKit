@@ -31,9 +31,10 @@ public struct RectangularGate : Gate {
       [-1 as Float], &v1, 1, UInt(values.count)
     )
     vDSP_vasm(v0, 1, v1, 1, [0.5 as Float], &v0, 1, UInt(values.count))
-    //FIXME: Why does commenting out the following line change the result?
-    vDSP_vthres(v0, 1, [0 as Float], &v1, 1, UInt(values.count))
-    return v1
+    /*
+    vDSP_vthres(v0, 1, [0 as Float], &v0, 1, UInt(values.count))
+    */
+    return v0
   }
 
   public func masking(_ population: Population) -> Population? {
@@ -48,10 +49,10 @@ public struct RectangularGate : Gate {
       cblas_saxpy(Int32(m0.count), 1, m, 1, &m0, 1)
     }
 
+    var result = [UInt8](repeating: 0, count: m0.count)
     let threshold = Float(dimensions.count)
     vDSP_vlim(m0, 1, [threshold], [1 as Float], &m0, 1, UInt(m0.count))
     vDSP_vthres(m0, 1, [0 as Float], &m0, 1, UInt(m0.count))
-    var result = [UInt8](repeating: 0, count: m0.count)
     vDSP_vfixu8(m0, 1, &result, 1, UInt(m0.count))
     return Population(population, mask: BitVector(result))
   }
