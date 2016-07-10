@@ -108,7 +108,7 @@ public struct Compensation {
       sample._rawEvents.withUnsafeBufferPointer {
         cblas_sgemm(
           CblasColMajor, CblasNoTrans, CblasNoTrans,
-          m, n, k, 1, matrix, m, $0.baseAddress, k, 1, &result, m
+          m, n, k, 1, matrix, m, $0.baseAddress!, k, 1, &result, m
         )
       }
     } else if parameters.count != sample.parameters.count {

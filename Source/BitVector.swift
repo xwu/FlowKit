@@ -111,24 +111,26 @@ public struct BitVector {
   public init(_ a: [UInt8]) {
     self.count = a.count
     
+    let bw = Bucket._bitWidth, capacity = (a.count + bw - 1) / bw
     var buckets = [Bucket]()
-    let capacity = (a.count + Bucket._bitWidth - 1) / Bucket._bitWidth
     buckets.reserveCapacity(capacity)
+    var bucket = 0 as Bucket
 
-    for i in 0..<(capacity - 1) {
-      let offset = i * Bucket._bitWidth
-      var bucket = 0 as Bucket
-      for j in 0..<Bucket._bitWidth {
-        bucket |= Bucket(a[offset + j] % 2) << Bucket(Bucket._bitWidth - j - 1)
+    var i = 0 as Bucket
+    for element in a {
+      bucket <<= 1
+      bucket += Bucket(element % 2)
+      i += 1
+      if i == Bucket(bw) {
+        buckets.append(bucket)
+        bucket = 0
+        i = 0
       }
+    }
+    if i > 0 {
+      bucket <<= Bucket((bw - (a.count % bw)) % bw)
       buckets.append(bucket)
     }
-    let offset = (capacity - 1) * Bucket._bitWidth
-    var bucket = 0 as Bucket
-    for j in 0..<(a.count % Bucket._bitWidth) {
-      bucket |= Bucket(a[offset + j] % 2) << Bucket(Bucket._bitWidth - j - 1)
-    }
-    buckets.append(bucket)
     self.buckets = buckets
   }
 

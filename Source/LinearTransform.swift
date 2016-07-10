@@ -32,7 +32,7 @@ public struct LinearTransform : Transform {
   public func scaling(_ values: [Float]) -> [Float] {
     var result = [Float](repeating: parameters.A, count: values.count)
     values.withUnsafeBufferPointer {
-      cblas_saxpy(Int32(result.count), 1, $0.baseAddress, 1, &result, 1)
+      cblas_saxpy(Int32(result.count), 1, $0.baseAddress!, 1, &result, 1)
     }
     cblas_sscal(Int32(result.count), 1 / _sum, &result, 1)
     return clipping(result)
