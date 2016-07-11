@@ -102,8 +102,8 @@ public struct EllipsoidGate : Gate {
       cblas_saxpy(Int32(ec), 1, &b + i, Int32(dc), &c, 1)
     }
     // Compare elements of `c` to `distanceSquared`
-    vDSP_vlim(c, 1, [distanceSquared.nextUp], [-1 as Float], &b, 1, UInt(ec))
-    vDSP_vthres(b, 1, [0 as Float], &c, 1, UInt(ec))
+    vDSP_vlim(c, 1, [distanceSquared.nextUp], [-1 as Float], &c, 1, UInt(ec))
+    vDSP_vthres(c, 1, [0 as Float], &c, 1, UInt(ec))
     return Population(population, mask: c)
   }
 }
