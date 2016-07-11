@@ -10,7 +10,7 @@ import XCTest
 @testable import FlowKit
 
 class HistogramTests: XCTestCase {
-  /*
+/*
    override func setUp() {
    super.setUp()
    // Put setup code here
@@ -22,7 +22,7 @@ class HistogramTests: XCTestCase {
    // This method is called after invocation of each test method in the class
    super.tearDown()
    }
-   */
+*/
   func testHistogram() {
     let testBundle = Bundle(for: SampleTests.self)
     let url = testBundle.urlForResource("Example", withExtension: "fcs")!
@@ -34,7 +34,7 @@ class HistogramTests: XCTestCase {
     let population0 = Population(sample)
     let histogram0 = Histogram(
       population0,
-      dimensions: ["FSC-A", "SSC-A"],
+      dimensions: ["SSC-A", "FSC-A"],
       resolution: 32
     )!
 
@@ -45,14 +45,12 @@ class HistogramTests: XCTestCase {
     let population1 = gate.masking(population0)!
     let histogram1 = Histogram(
       population1,
-      dimensions: ["FSC-A", "SSC-A"],
+      dimensions: ["SSC-A", "FSC-A"],
       resolution: 32
     )!
     // print(histogram0.data, histogram1.data)
-    /*
     for i in 0..<32 * 15 {
       XCTAssertEqual(histogram0.values[i], histogram1.values[i])
     }
-    */
   }
 }
