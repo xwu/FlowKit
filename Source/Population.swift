@@ -7,38 +7,41 @@
 //
 
 import Foundation
+import Accelerate
 
 public final class Population {
   public let root: Sample
-  public let mask: BitVector?
+  public let mask: [Float]?
   public let count: Int
 
-  public init(_ root: Sample, mask: BitVector? = nil) {
+  public init(_ root: Sample, mask: [Float]? = nil) {
     if let mask = mask {
       precondition(root.count == mask.count)
     }
     self.root = root
     self.mask = mask
-    count = mask?.cardinality() ?? root.count
+    if let mask = mask {
+      count = Int(cblas_sasum(Int32(mask.count), mask, 1))
+    } else {
+      count = root.count
+    }
   }
 
-  public init(_ parent: Population, mask: BitVector? = nil) {
+  public init(_ parent: Population, mask: [Float]? = nil) {
     if let mask = mask {
       precondition(parent.root.count == mask.count)
     }
     self.root = parent.root
-    let m: BitVector?
-    switch (parent.mask, mask) {
-    case let (x?, y?):
-      m = x & y
-    case let (x?, nil):
-      m = x
-    case let (nil, y?):
-      m = y
-    case (nil, nil):
-      m = nil
+    if var mask = mask {
+      if let pm = parent.mask {
+        // Compute `mask & pm`
+        vDSP_vmul(mask, 1, pm, 1, &mask, 1, UInt(mask.count))
+      }
+      self.mask = mask
+      count = Int(cblas_sasum(Int32(mask.count), mask, 1))
+    } else {
+      self.mask = parent.mask ?? nil
+      count = parent.count
     }
-    self.mask = m
-    count = m?.cardinality() ?? parent.root.count
   }
 }

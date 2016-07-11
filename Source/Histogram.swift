@@ -25,13 +25,6 @@ public struct Histogram {
     self.ranges = ranges
     self.resolution = resolution
 
-    // If necessary, unpack the population mask and store in `unpacked`
-    var unpacked = [Float](repeating: 0, count: population.root.count)
-    if let mask = population.mask {
-      let u = BitVector.unpacking(mask.buckets, count: population.root.count)
-      vDSP_vfltu8(u, 1, &unpacked, 1, UInt(population.root.count))
-    }
-
     func _binned(_ values: [Float], _ range: Range<Float>) -> [Float] {
       var v0 = values
       let (l, u) = (range.lowerBound, range.upperBound)
@@ -54,7 +47,7 @@ public struct Histogram {
     var xs = _binned(v0, ranges[0])
     // Use `unpacked` to compress events if the population has a mask
     if let mask = population.mask {
-      vDSP_vcmprs(xs, 1, unpacked, 1, &xs, 1, UInt(mask.count))
+      vDSP_vcmprs(xs, 1, mask, 1, &xs, 1, UInt(mask.count))
       xs.removeLast(mask.count - population.count)
     }
 
@@ -81,7 +74,7 @@ public struct Histogram {
       var ys = _binned(v1, ranges[1])
       // Use `unpacked` to compress events if the population has a mask
       if let mask = population.mask {
-        vDSP_vcmprs(ys, 1, unpacked, 1, &ys, 1, UInt(mask.count))
+        vDSP_vcmprs(ys, 1, mask, 1, &ys, 1, UInt(mask.count))
         ys.removeLast(mask.count - population.count)
       }
       //TODO: Verify that the order of axes implied below is conducive for use

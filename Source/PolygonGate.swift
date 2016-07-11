@@ -37,7 +37,7 @@ public struct PolygonGate : Gate {
     // Bounds
     let bx = (vx.min() ?? -Float.infinity, vx.max() ?? Float.infinity)
     let by = (vy.min() ?? -Float.infinity, vy.max() ?? Float.infinity)
-    var result = [UInt8](repeating: 0, count: x.count)
+    var result = [Float](repeating: 0, count: x.count)
 
     outer: for idx in 0..<x.count {
       // Coordinates of point to be interrogated
@@ -159,9 +159,8 @@ public struct PolygonGate : Gate {
         }
       }
       // It's an even-odd algorithm, after all...
-      result[idx] = UInt8(intersections % 2)
+      result[idx] = Float(intersections % 2)
     }
-    let mask = BitVector(result)
-    return Population(population, mask: mask)
+    return Population(population, mask: result)
   }
 }

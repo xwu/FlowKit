@@ -70,7 +70,13 @@ class GateTests: XCTestCase {
     let s = Sample(sample, _times: 64)
     // Test for correctness
     let population = gate.masking(s)!
+    XCTAssertEqual(
+      String(population.mask![0..<16]),
+      String([1 as Float, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    )
+    /*
     XCTAssertEqual("\(population.mask![0..<16])", "1011111000000000")
+    */
     // Test performance
     self.measure {
       let population = gate.masking(s)!
@@ -95,7 +101,13 @@ class GateTests: XCTestCase {
     let s = Sample(sample, _times: 64)
     // Test for correctness
     let population = gate.masking(s)!
+    XCTAssertEqual(
+      String(population.mask![0..<16]),
+      String([0 as Float, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    )
+    /*
     XCTAssertEqual("\(population.mask![0..<16])", "0000000111111111")
+    */
     // Test performance
     self.measure {
       let population = gate.masking(s)!
@@ -132,7 +144,13 @@ class GateTests: XCTestCase {
     )
     // Test for correctness
     let population = gate.masking(s)!
+    XCTAssertEqual(
+      String(population.mask![0..<8]),
+      String([0 as Float, 1, 0, 1, 1, 0, 1, 1])
+    )
+    /*
     XCTAssertEqual("\(population.mask![0..<8])", "01011011")
+    */
     // Test performance
     self.measure {
       let population = gate.masking(s)!

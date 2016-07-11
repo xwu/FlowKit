@@ -15,7 +15,6 @@ public struct EllipsoidGate : Gate {
   public let covariances: [Float]
   public let distanceSquared: Float
   internal let _lowerTriangle: [Float]?
-
   // The following properties are computed only for two-dimensional gates
   public let halfAxes: (Float, Float)?
   public let rotation: Float?
@@ -26,6 +25,24 @@ public struct EllipsoidGate : Gate {
   ) {
     precondition(dimensions.count == means.count &&
       means.count * means.count == covariances.count)
+
+    self.dimensions = dimensions
+    self.means = means
+    self.covariances = covariances
+    self.distanceSquared = distanceSquared
+
+    // Cholesky factorization of covariance matrix
+    if dimensions.count > 1 {
+      var uplo = "L".cString(using: .utf8)!
+      var n = Int32(dimensions.count)
+      var a = covariances, lda = n, info = 0 as Int32
+      spotrf_(&uplo, &n, &a, &lda, &info)
+      // If `info` isn't 0, covariance matrix had illegal values or wasn't
+      // positive definite
+      _lowerTriangle = (info == 0) ? a : nil
+    } else {
+      _lowerTriangle = nil
+    }
 
     var halfAxes: (Float, Float)? = nil
     var rotation: Float? = nil
@@ -45,24 +62,6 @@ public struct EllipsoidGate : Gate {
     }
     self.halfAxes = halfAxes
     self.rotation = rotation
-
-    self.dimensions = dimensions
-    self.means = means
-    self.covariances = covariances
-    self.distanceSquared = distanceSquared
-
-    // Cholesky factorization of covariance matrix
-    if dimensions.count > 1 {
-      var uplo = "L".cString(using: .utf8)!
-      var n = Int32(dimensions.count)
-      var a = covariances, lda = n, info = 0 as Int32
-      spotrf_(&uplo, &n, &a, &lda, &info)
-      // If `info` isn't 0, covariance matrix had illegal values or wasn't
-      // positive definite
-      _lowerTriangle = (info == 0) ? a : nil
-    } else {
-      _lowerTriangle = nil
-    }
   }
 
   public func masking(_ population: Population) -> Population? {
@@ -74,9 +73,7 @@ public struct EllipsoidGate : Gate {
     for (i, d) in dimensions.enumerated() {
       catlas_sset(Int32(ec), -means[i], &c + i, Int32(dc))
       guard let values = population.root.events[d] else { return nil }
-      values.withUnsafeBufferPointer {
-        cblas_saxpy(Int32(ec), 1, $0.baseAddress!, 1, &c + i, Int32(dc))
-      }
+      cblas_saxpy(Int32(ec), 1, values, 1, &c + i, Int32(dc))
     }
     // Solve for b: covariance * b = c
     //
@@ -96,22 +93,17 @@ public struct EllipsoidGate : Gate {
     // If `info` isn't 0, unsuccessful computation of matrix solution
     guard info == 0 else { return nil }
 
-    // Multiply c and b element-wise
-    vDSP_vmul(&c, 1, &b, 1, &b, 1, UInt(dc * ec))
-    // Sum elements of b row-wise; we'll reuse c for storage
-    /* c.removeLast((dc - 1) * ec) */
+    // Multiply `c` and `b` element-wise
+    vDSP_vmul(c, 1, b, 1, &b, 1, UInt(dc * ec))
+    // Sum elements of `b` row-wise; we'll reuse `c` for storage
+    c.removeLast((dc - 1) * ec)
     catlas_sset(Int32(ec), 0, &c, 1)
     for i in 0..<dc {
-      b.withUnsafeMutableBufferPointer {
-        cblas_saxpy(Int32(ec), 1, $0.baseAddress! + i, Int32(dc), &c, 1)
-      }
+      cblas_saxpy(Int32(ec), 1, &b + i, Int32(dc), &c, 1)
     }
-
-    var result = [UInt8](repeating: 0, count: ec)
+    // Compare elements of `c` to `distanceSquared`
     vDSP_vlim(c, 1, [distanceSquared.nextUp], [-1 as Float], &b, 1, UInt(ec))
     vDSP_vthres(b, 1, [0 as Float], &c, 1, UInt(ec))
-    vDSP_vfixu8(c, 1, &result, 1, UInt(ec))
-    let mask = BitVector(result)
-    return Population(population, mask: mask)
+    return Population(population, mask: c)
   }
 }

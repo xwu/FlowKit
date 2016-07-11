@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Accelerate
 
 public struct BooleanGate: Gate {
   public enum Operation {
@@ -34,23 +35,30 @@ public struct BooleanGate: Gate {
     case .not:
       // Each not gate can only reference one other gate
       // Note that we must mask the parent population and not the root sample
-      return Population(population, mask: ~mask)
+      vDSP_vsmsa(
+        mask, 1, [-1 as Float], [1 as Float], &mask, 1, UInt(mask.count)
+      )
+      return Population(population, mask: mask)
     case .and:
       for gate in gates.dropFirst() {
         guard let m = gate.masking(population)?.mask else { return nil }
-        mask &= m
+        vDSP_vmul(mask, 1, m, 1, &mask, 1, UInt(mask.count))
       }
       return Population(population.root, mask: mask)
     case .or:
       for gate in gates.dropFirst() {
         guard let m = gate.masking(population)?.mask else { return nil }
-        mask |= m
+        vDSP_vadd(mask, 1, m, 1, &mask, 1, UInt(mask.count))
+        vDSP_vclip(
+          mask, 1, [0 as Float], [1 as Float], &mask, 1, UInt(mask.count)
+        )
       }
       return Population(population.root, mask: mask)
     case .xor:
       for gate in gates.dropFirst() {
         guard let m = gate.masking(population)?.mask else { return nil }
-        mask ^= m
+        vDSP_vsub(m, 1, mask, 1, &mask, 1, UInt(mask.count))
+        vDSP_vabs(mask, 1, &mask, 1, UInt(mask.count))
       }
       return Population(population.root, mask: mask)
     }
