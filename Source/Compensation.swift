@@ -26,7 +26,7 @@ public struct Compensation {
         break
       }
     }
-    guard let c = strings.first, count = Int(c) else { return nil }
+    guard let c = strings.first, let count = Int(c) else { return nil }
     // Matrix must be square (preceded by a list of parameter names)
     guard strings.count - 1 == count * (1 + count) else { return nil }
     let detectors = [String](strings[1...count])

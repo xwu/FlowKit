@@ -27,7 +27,7 @@ public struct PolygonGate : Gate {
     guard
       vertices.count > 1,
       let x = population.root.events[dimensions[0]],
-      y = population.root.events[dimensions[1]]
+      let y = population.root.events[dimensions[1]]
       else { return nil }
 
     let vertexCount = vertices.count

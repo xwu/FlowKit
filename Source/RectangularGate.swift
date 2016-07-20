@@ -32,7 +32,7 @@ public struct RectangularGate : Gate {
 
   public func masking(_ population: Population) -> Population? {
     guard
-      let d0 = dimensions.first, v0 = population.root.events[d0]
+      let d0 = dimensions.first, let v0 = population.root.events[d0]
       else { return nil }
     var result = _masking(v0, ranges[0])
     for (i, d) in dimensions.enumerated().dropFirst() {

@@ -124,7 +124,7 @@ public final class Sample {
     do {
       let areEmptyValuesForbidden = options.contains(.forbidEmptyKeywordValues)
       guard
-        let begin = Int(header[1]), end = Int(header[2]) where end > begin
+        let begin = Int(header[1]), let end = Int(header[2]), end > begin
         else { return nil }
       // Note bounds checking
       let subdata = data.subdata(
@@ -137,10 +137,10 @@ public final class Sample {
         forbiddingEmptyValues: areEmptyValuesForbidden
       )
       // Check for supplemental text
-      if let b1 = dict["BEGINSTEXT"], begin1 = Int(b1)
-        where begin1 != begin && begin1 != 0,
-        let e1 = dict["ENDSTEXT"], end1 = Int(e1)
-        where end1 != end && end1 > begin1 {
+      if let b1 = dict["BEGINSTEXT"], let begin1 = Int(b1),
+        begin1 != begin && begin1 != 0,
+        let e1 = dict["ENDSTEXT"], let end1 = Int(e1),
+        end1 != end && end1 > begin1 {
         // Note bounds checking
         let subdata1 = data.subdata(
           in: (offset + begin1)..<min(offset + end1 + 1, data.count)
@@ -159,7 +159,7 @@ public final class Sample {
 
     // Determine number and names of parameters
     guard
-      let p = keywords["$PAR"], par = Int(p) where par > 0
+      let p = keywords["$PAR"], let par = Int(p), par > 0
       else { return nil }
     let parameters = (1...par).map { i -> String in
       guard let parameter = keywords["$P\(i)N"] else { return "" }
@@ -168,7 +168,7 @@ public final class Sample {
 
     // Determine event count
     guard
-      let t = keywords["$TOT"], tot = Int(t) where tot > 0
+      let t = keywords["$TOT"], let tot = Int(t), tot > 0
       else { return nil }
 
     // Determine byte order
@@ -193,23 +193,23 @@ public final class Sample {
     var rawEvents: [Float]
     do {
       guard
-        let mode = keywords["$MODE"]?.uppercased() where mode == "L"
+        let mode = keywords["$MODE"]?.uppercased(), mode == "L"
         else { return nil }
       let begin: Int
-      if let begin1 = Int(header[3]) where begin1 > 0 {
+      if let begin1 = Int(header[3]), begin1 > 0 {
         begin = begin1
       } else {
         guard
-          let bd = keywords["$BEGINDATA"], begin2 = Int(bd) where begin2 > 0
+          let bd = keywords["$BEGINDATA"], let begin2 = Int(bd), begin2 > 0
           else { return nil }
         begin = begin2
       }
       let end: Int
-      if let end1 = Int(header[4]) where end1 >= begin {
+      if let end1 = Int(header[4]), end1 >= begin {
         end = end1
       } else {
         guard
-          let ed = keywords["$ENDDATA"], end2 = Int(ed) where end2 >= begin
+          let ed = keywords["$ENDDATA"], let end2 = Int(ed), end2 >= begin
           else { return nil }
         end = end2
       }
@@ -255,15 +255,15 @@ public final class Sample {
         }
       case "I":
         let adjustBitWidth: Bool
-        if let sys = keywords["$SYS"]?.uppercased()
-          where sys == "CXP" || sys == "CPX" {
+        if let sys = keywords["$SYS"]?.uppercased(),
+          sys == "CXP" || sys == "CPX" {
           adjustBitWidth = true
         } else {
           adjustBitWidth = false
         }
         let bitWidths: [Int] = (1...par).map {
           guard
-            let bw = keywords["$P\($0)B"], bitWidth = Int(bw)
+            let bw = keywords["$P\($0)B"], let bitWidth = Int(bw)
             else { return 0 }
           if [64, 32, 16, 8].contains(bitWidth) { return bitWidth }
           return (bitWidth == 10 && adjustBitWidth) ? 16 : 0
@@ -281,7 +281,7 @@ public final class Sample {
         let ranges: [Int] = (1...par).map {
           // Don't mask anything if required value is missing
           guard
-            let ra = keywords["$P\($0)R"], range = Int(ra)
+            let ra = keywords["$P\($0)R"], let range = Int(ra)
             else { return 1 << bitWidths[$0 - 1] }
           return range
         }
@@ -296,7 +296,7 @@ public final class Sample {
           }
           guard
             arr.count >= 2,
-            let f1 = arr[0], f2 = arr[1] where !f1.isNaN && !f2.isNaN
+            let f1 = arr[0], let f2 = arr[1], !f1.isNaN && !f2.isNaN
             else { return (0, 0) }
           // Special handling for common error (explained in FCS specification)
           if f1 > 0 && f2 == 0 { return (f1, 1) }
@@ -307,7 +307,7 @@ public final class Sample {
         let scales: [Float] = (1...par).map {
           // Assume no scaling if optional value is missing
           guard
-            let g = keywords["$P\($0)G"], gain = Float(g) where !gain.isNaN
+            let g = keywords["$P\($0)G"], let gain = Float(g), !gain.isNaN
             else { return 1 }
           return gain
         }

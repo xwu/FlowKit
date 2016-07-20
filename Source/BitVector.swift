@@ -169,7 +169,7 @@ public struct BitVector {
 
     // Various methods assume bits past `count` are zero
     let (_, mask) = BitVector._masks(for: 0..<count)
-    if let last = self.buckets.last where last != (last & mask) {
+    if let last = self.buckets.last, last != (last & mask) {
       self.buckets[self.buckets.endIndex - 1] = (last & mask)
     }
   }
@@ -184,7 +184,7 @@ public struct BitVector {
 
     // Various methods assume bits past `count` are zero
     let (_, mask) = BitVector._masks(for: 0..<count)
-    if let last = buckets.last where last != (last & mask) {
+    if let last = buckets.last, last != (last & mask) {
       buckets[buckets.endIndex - 1] = (last & mask)
     }
   }
