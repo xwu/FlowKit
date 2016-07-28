@@ -140,13 +140,16 @@ public struct Compensation {
       guard info == 0 else { return }
     }
 
+    // Transpose the result; note that vDSP takes matrices in row-major ordering
+    vDSP_mtrans(
+      result, 1, &result, 1, UInt(parameters.count), UInt(sample.count)
+    )
     // Populate `sample.events` with any new dimensions generated and replace
     // any existing dimensions that may have been modified by unmixing
     let s = Set(parameters)
       .subtracting(Set(sample.events.keys))
       .union(Set(fluorochromes ?? detectors))
-    for (i, p) in parameters.enumerated() {
-      guard s.contains(p) else { continue }
+    for (i, p) in parameters.enumerated() where s.contains(p) {
       sample.events[p] = [Float](
         result[i * sample.count..<(i + 1) * sample.count]
       )
