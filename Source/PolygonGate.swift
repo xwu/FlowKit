@@ -107,7 +107,8 @@ public struct PolygonGate : Gate {
       // interrogated
       var intersections = 0
 
-      inner1: for i in 0...lastOffAxisVertexIndex {
+      var i = 0
+      inner1: while i <= lastOffAxisVertexIndex {
         // Current vertex coordinates minus coordinates of point to be
         // interrogated
         let cx = vx[i] - xi, cy = vy[i] - yi
@@ -169,7 +170,7 @@ public struct PolygonGate : Gate {
             result[idx] = 1
             continue outer
           }
-          if skippedVertices > 0 || (skippedVertices == 0 && test > 0) {
+          if (skippedVertices == 0 && test > 0) || skippedVertices > 0 {
             intersections += 1
           }
         }
@@ -177,6 +178,7 @@ public struct PolygonGate : Gate {
         skippedVertices = 0
         px = cx
         py = cy
+        i += 1
       }
       
       // It's an even-odd algorithm, after all...
