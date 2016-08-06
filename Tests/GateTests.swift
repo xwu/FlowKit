@@ -57,7 +57,7 @@ class GateTests: XCTestCase {
 
   func testRectangularGatePerformance() {
     let testBundle = Bundle(for: SampleTests.self)
-    let url = testBundle.urlForResource("Example", withExtension: "fcs")!
+    let url = testBundle.url(forResource: "Example", withExtension: "fcs")!
     let data = try! Data(contentsOf: url)
     let sample = Sample(data)!
     let transform = LinearTransform()!
@@ -89,7 +89,7 @@ class GateTests: XCTestCase {
 
   func testEllipsoidGatePerformance() {
     let testBundle = Bundle(for: SampleTests.self)
-    let url = testBundle.urlForResource("Example", withExtension: "fcs")!
+    let url = testBundle.url(forResource: "Example", withExtension: "fcs")!
     let data = try! Data(contentsOf: url)
     let sample = Sample(data)!
     let transform = LinearTransform()!
@@ -123,7 +123,7 @@ class GateTests: XCTestCase {
 
   func testPolygonGatePerformance() {
     let testBundle = Bundle(for: SampleTests.self)
-    let url = testBundle.urlForResource("Example", withExtension: "fcs")!
+    let url = testBundle.url(forResource: "Example", withExtension: "fcs")!
     let data = try! Data(contentsOf: url)
     let sample = Sample(data)!
     /*

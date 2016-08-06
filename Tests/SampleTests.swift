@@ -25,7 +25,7 @@ class SampleTests : XCTestCase {
 */
   func testSample() {
     let testBundle = Bundle(for: SampleTests.self)
-    let url = testBundle.urlForResource("Example", withExtension: "fcs")
+    let url = testBundle.url(forResource: "Example", withExtension: "fcs")
     let data = try! Data(contentsOf: url!)
     guard let sample = Sample(data) else { return }
     XCTAssertEqual(sample.parameters.count, 16)

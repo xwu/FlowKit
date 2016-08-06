@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Accelerate
 
 // MARK: Convenience functions
 internal extension Data {
@@ -224,7 +225,14 @@ public final class Sample {
       case "D":
         let size = strideof(Double.self)
         rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
-        if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
+        //FIXME: We assume that endianness for floating point and integer types
+        //       are the same, which is a safe assumption for most modern
+        //       systems but is not guaranteed for all systems
+        if !isSwapped {
+          subdata.withUnsafeBytes { (ptr: UnsafePointer<Double>) in
+            vDSP_vdpsp(ptr, 1, &rawEvents, 1, UInt(rawEvents.count))
+          }
+        } else if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
             rawEvents[i / size] = Float(NSSwapBigDoubleToHost(
               NSSwappedDouble(v: subdata.unsafeValue(at: i))
@@ -240,7 +248,14 @@ public final class Sample {
       case "F":
         let size = strideof(Float.self)
         rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
-        if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
+        //FIXME: We assume that endianness for floating point and integer types
+        //       are the same, which is a safe assumption for most modern
+        //       systems but is not guaranteed for all systems
+        if !isSwapped {
+          subdata.withUnsafeBytes { (ptr: UnsafePointer<Float>) in
+            cblas_scopy(Int32(rawEvents.count), ptr, 1, &rawEvents, 1)
+          }
+        } else if byteOrder == CFByteOrder(CFByteOrderBigEndian.rawValue) {
           for i in stride(from: 0, to: subdata.count - size + 1, by: size) {
             rawEvents[i / size] = NSSwapBigFloatToHost(
               NSSwappedFloat(v: subdata.unsafeValue(at: i))

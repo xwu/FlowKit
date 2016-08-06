@@ -15,7 +15,7 @@ class CompensationTests : XCTestCase {
   override func setUp() {
     super.setUp()
     let testBundle = Bundle(for: SampleTests.self)
-    let url = testBundle.urlForResource("Example", withExtension: "fcs")
+    let url = testBundle.url(forResource: "Example", withExtension: "fcs")
     let data = try! Data(contentsOf: url!)
     guard let sample = Sample(data) else { return }
     self.sample = sample

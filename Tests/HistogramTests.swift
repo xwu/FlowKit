@@ -25,7 +25,7 @@ class HistogramTests: XCTestCase {
 */
   func testHistogram() {
     let testBundle = Bundle(for: SampleTests.self)
-    let url = testBundle.urlForResource("Example", withExtension: "fcs")!
+    let url = testBundle.url(forResource: "Example", withExtension: "fcs")!
     let data = try! Data(contentsOf: url)
     let sample = Sample(data)!
     let transform = LinearTransform()!
