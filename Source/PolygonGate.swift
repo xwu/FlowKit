@@ -49,6 +49,50 @@ public struct PolygonGate : Gate {
         continue outer
       }
 
+      // Find the last off-axis vertex
+      var isLastOffAxisVertexFound = false
+      var skippedVerticesAfterLastOffAxisVertex = 0
+      // See comment below about `skippedVertices`
+      var lastOffAxisVertexIndex = vertexCount - 1
+
+      // Previous vertex coordinates minus coordinates of point to be
+      // interrogated: initialize using last off-axis vertex
+      var px = Float.nan, py = Float.nan
+      inner0: while lastOffAxisVertexIndex >= 0 {
+        // Current vertex coordinates minus coordinates of point to be
+        // interrogated
+        let cx = vx[lastOffAxisVertexIndex] - xi
+        let cy = vy[lastOffAxisVertexIndex] - yi
+
+        if cy == 0 {
+          if cx == 0 {
+            result[idx] = 1
+            continue outer
+          }
+          skippedVerticesAfterLastOffAxisVertex += cx < 0 ? -1 : vertexCount
+          lastOffAxisVertexIndex -= 1
+          continue inner0
+        }
+
+        isLastOffAxisVertexFound = true
+        px = cx
+        py = cy
+        break
+      }
+
+      if !isLastOffAxisVertexFound {
+        // If the point to be interrogated lies on an edge connecting two
+        // vertices that have the same y-coordinate, then
+        // `skippedVerticesAfterLastOffAxisVertex` will be positive but not a
+        // multiple of `vertexCount`
+        if skippedVerticesAfterLastOffAxisVertex > 0 &&
+          skippedVerticesAfterLastOffAxisVertex % vertexCount > 0 {
+          result[idx] = 1
+        } // else { result[idx] = 0 }
+        continue outer
+      }
+
+      var isFirstOffAxisVertexFound = false
       var skippedVertices = 0
       // We'll increment `skippedVertices` by `vertexCount` on skipping a
       // positive vertex and decrement it by 1 on skipping a negative vertex
@@ -61,105 +105,84 @@ public struct PolygonGate : Gate {
       // Here, "positive" and "negative" vertices refer to the x-coordinate of
       // the vertex after subtracting the x-coordinate of the point to be
       // interrogated
-      var isFirstOffAxisVertexFound = false
-      var firstOffAxisTest = false
-      var skippedVerticesBeforeFirstOffAxisVertex = 0
-      var firstOffAxisAdditionalTest = false
       var intersections = 0
 
-      // Previous vertex coordinates minus coordinates of point to be
-      // interrogated: initialize using last vertex
-      var px = vx[vertexCount - 1] - xi, py = vy[vertexCount - 1] - yi
-      inner: for i in 0..<vertexCount {
-        let cx = vx[i] - xi, cy = vy[i] - yi
+      inner1: for i in 0...lastOffAxisVertexIndex {
         // Current vertex coordinates minus coordinates of point to be
         // interrogated
-        let pxcy = px * cy, cxpy = cx * py
-        let test = (cy < 0) != (py < 0)
-        // `test == true` if the edge joining the previous vertex to the current
-        // vertex (both minus coordinates of the point to be interrogated)
-        // crosses the x-axis
-
-        // Check collinearity; gives a false negative if (`px`, `py`) or
-        // (`cx`, `cy`) is at the origin, but that case is handled below
-        if test && (pxcy == cxpy) {
-          result[idx] = 1
-          continue outer
-        }
+        let cx = vx[i] - xi, cy = vy[i] - yi
 
         if cy == 0 {
-          if cx < 0 {
-            skippedVertices -= 1
-            continue inner
+          if cx == 0 {
+            result[idx] = 1
+            continue outer
           }
-          if cx > 0 {
-            skippedVertices += vertexCount
-            continue inner
-          }
-          // `cx == 0`
+          skippedVertices += cx < 0 ? -1 : vertexCount
+          continue inner1
+        }
+
+        if !isFirstOffAxisVertexFound {
+          isFirstOffAxisVertexFound = true
+          skippedVertices += skippedVerticesAfterLastOffAxisVertex
+        }
+        // If the point to be interrogated lies on an edge connecting two
+        // vertices that have the same y-coordinate, then `skippedVertices` will
+        // be positive but not a multiple of `vertexCount`
+        if skippedVertices > 0 && skippedVertices % vertexCount > 0 {
           result[idx] = 1
           continue outer
         }
 
-        let additionalTest = (cy > py) ? (pxcy > cxpy) : (pxcy < cxpy)
-        // `additionalTest == true` if the edge joining the previous vertex to
-        // the current vertex (both minus coordinates of the point to be
-        // interrogated) crosses the *positive* x-axis, provided that
-        // `test == true` and `cy != 0`
-        //
-        // We must solve:
-        //     cx - cy * (cx - px) / (cy - py) > 0
-        //
-        // Rearranging, we have:
-        //                                  cx > cy * (cx - px) / (cy - py)
-        //
-        // If `(cy - py) > 0`, i.e. `cy > py`, then we have:
-        //                      cx * (cy - py) > cy * (cx - px)
-        //                   cx * cy - cx * py > cx * cy - px * cy
-        //                            -cx * py > -px * cy
-        //                             px * cy > cx * py
-        //
-        // If on the other hand `(cy - py) < 0`, i.e. `cy < py`, then we have:
-        //                      cx * (cy - py) < cy * (cx - px)
-        //                                    ...
-        //                             px * cy < cx * py
-        //
-        // Note that `cy` cannot be equal to `py`, because in that case either
-        // `test == false` or `cy == 0`, and we have stipulated that
-        // `test == true` and `cy != 0`
+        // Test if the edge joining the previous vertex to the current vertex
+        // (both minus coordinates of the point to be interrogated) crosses the
+        // x-axis
+        if (cy < 0) != (py < 0) {
+          let test = (cy - py) * (px * cy - cx * py)
+          // `test > 0` if the edge joining the previous vertex to the current
+          // vertex (both minus coordinates of the point to be interrogated)
+          // crosses the *positive* x-axis, provided that `(cy < 0) != (py < 0)`
+          // and `cy != 0`
+          //
+          // We must solve:
+          //     cx - cy * (cx - px) / (cy - py) > 0
+          //
+          // Rearranging, we have:
+          //                                  cx > cy * (cx - px) / (cy - py)
+          //
+          // If `(cy - py) > 0`, i.e. `cy > py`, then we have:
+          //                      cx * (cy - py) > cy * (cx - px)
+          //                   cx * cy - cx * py > cx * cy - px * cy
+          //                            -cx * py > -px * cy
+          //                             px * cy > cx * py
+          //
+          // If on the other hand `(cy - py) < 0`, i.e. `cy < py`, then we have:
+          //                      cx * (cy - py) < cy * (cx - px)
+          //                                    ...
+          //                             px * cy < cx * py
+          //
+          // Note that `cy` cannot be equal to `py`, because in that case either
+          // `(cy < 0) == (py < 0)`, and we stipulated `(cy < 0) != (py < 0)`
 
-        if !isFirstOffAxisVertexFound {
-          // Defer incrementing or decrementing `intersections` for the first
-          // off-axis vertex we find until we know if we've got to take into
-          // account any skipped vertices at the end of the array
-          isFirstOffAxisVertexFound = true
-          firstOffAxisTest = test
-          skippedVerticesBeforeFirstOffAxisVertex = skippedVertices
-          firstOffAxisAdditionalTest = additionalTest
-        } else if test {
-          if skippedVertices > 0 || (skippedVertices == 0 && additionalTest) {
+          // First, check collinearity; gives a false negative if (`px`, `py`)
+          // or (`cx`, `cy`) is at the origin, but that case is already handled
+          if test == 0 {
+            result[idx] = 1
+            continue outer
+          }
+          if skippedVertices > 0 || (skippedVertices == 0 && test > 0) {
             intersections += 1
           }
         }
+
         skippedVertices = 0
         px = cx
         py = cy
       }
-      if !isFirstOffAxisVertexFound {
-        // result[idx] = 0
-        continue outer
-      }
-      // We've deliberately deferred incrementing or decrementing
-      // `intersections` for the first off-axis vertex until now
-      if firstOffAxisTest {
-        skippedVertices += skippedVerticesBeforeFirstOffAxisVertex
-        if skippedVertices > 0 ||
-          (skippedVertices == 0 && firstOffAxisAdditionalTest) {
-          intersections += 1
-        }
-      }
+      
       // It's an even-odd algorithm, after all...
-      result[idx] = Float(intersections % 2)
+      if intersections % 2 == 1 {
+        result[idx] = 1
+      } // else { result[idx] = 0 }
     }
     return Population(population, mask: result)
   }
