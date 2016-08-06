@@ -75,7 +75,7 @@ public struct PolygonGate : Gate {
         // Current vertex coordinates minus coordinates of point to be
         // interrogated
         let pxcy = px * cy, cxpy = cx * py
-        let test = (cy < 0.0) != (py < 0.0)
+        let test = (cy < 0) != (py < 0)
         // `test == true` if the edge joining the previous vertex to the current
         // vertex (both minus coordinates of the point to be interrogated)
         // crosses the x-axis
@@ -83,20 +83,20 @@ public struct PolygonGate : Gate {
         // Check collinearity; gives a false negative if (`px`, `py`) or
         // (`cx`, `cy`) is at the origin, but that case is handled below
         if test && (pxcy == cxpy) {
-          // It's already the case that `r[idx - offset] == 1`
+          // It's already the case that `result[idx] == 1`
           continue outer
         }
 
-        if cy == 0.0 {
-          if cx < 0.0 {
+        if cy == 0 {
+          if cx < 0 {
             skippedVertices -= 1
             continue inner
           }
-          if cx > 0.0 {
+          if cx > 0 {
             skippedVertices += vertexCount
             continue inner
           }
-          // `cx == 0.0`
+          // `cx == 0`
           // It's already the case that `result[idx] == 1`
           continue outer
         }
@@ -105,7 +105,7 @@ public struct PolygonGate : Gate {
         // `additionalTest == true` if the edge joining the previous vertex to
         // the current vertex (both minus coordinates of the point to be
         // interrogated) crosses the *positive* x-axis, provided that
-        // `test == true` and `cy != 0.0`
+        // `test == true` and `cy != 0`
         //
         // We must solve:
         //     cx - cy * (cx - px) / (cy - py) > 0
@@ -125,8 +125,8 @@ public struct PolygonGate : Gate {
         //                             px * cy < cx * py
         //
         // Note that `cy` cannot be equal to `py`, because in that case either
-        // `test == false` or `cy == 0.0`, and we have stipulated that
-        // `test == true` and `cy != 0.0`
+        // `test == false` or `cy == 0`, and we have stipulated that
+        // `test == true` and `cy != 0`
 
         if !isFirstOffAxisVertexFound {
           // Defer incrementing or decrementing `intersections` for the first
