@@ -37,15 +37,15 @@ public struct PolygonGate : Gate {
     // Bounds
     let bx = (vx.min() ?? -Float.infinity, vx.max() ?? Float.infinity)
     let by = (vy.min() ?? -Float.infinity, vy.max() ?? Float.infinity)
-    var result = [Float](repeating: 0, count: x.count)
 
+    var result = [Float](repeating: 0, count: x.count)
     outer: for idx in 0..<x.count {
       // Coordinates of point to be interrogated
       let xi = x[idx], yi = y[idx]
 
       // First, check bounds
       if xi < bx.0 || xi > bx.1 || yi < by.0 || yi > by.1 {
-        result[idx] = 0
+        // result[idx] = 0
         continue outer
       }
 
@@ -83,7 +83,7 @@ public struct PolygonGate : Gate {
         // Check collinearity; gives a false negative if (`px`, `py`) or
         // (`cx`, `cy`) is at the origin, but that case is handled below
         if test && (pxcy == cxpy) {
-          // It's already the case that `result[idx] == 1`
+          result[idx] = 1
           continue outer
         }
 
@@ -97,7 +97,7 @@ public struct PolygonGate : Gate {
             continue inner
           }
           // `cx == 0`
-          // It's already the case that `result[idx] == 1`
+          result[idx] = 1
           continue outer
         }
 
@@ -146,7 +146,7 @@ public struct PolygonGate : Gate {
         py = cy
       }
       if !isFirstOffAxisVertexFound {
-        result[idx] = 0
+        // result[idx] = 0
         continue outer
       }
       // We've deliberately deferred incrementing or decrementing
