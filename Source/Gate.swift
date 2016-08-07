@@ -14,8 +14,8 @@ public protocol Gate {
   func masking(_ sample: Sample) -> Population?
 }
 
-public extension Gate {
-  func masking(_ sample: Sample) -> Population? {
+extension Gate {
+  public func masking(_ sample: Sample) -> Population? {
     return masking(Population(sample))
   }
 }

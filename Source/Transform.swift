@@ -14,6 +14,8 @@ import Accelerate
 public typealias _Parameters = (T: Float, W: Float, M: Float, A: Float)
 
 public protocol Transform {
+  //FIXME: When typealias inside protocols become available, move _Parameters
+  //       here and remove the underscore
   static var defaultParameters: _Parameters { get }
   var parameters: _Parameters { get }
   var bounds: (Float, Float)? { get }
@@ -35,7 +37,7 @@ public protocol Transform {
   func clip(_ sample: Sample, dimensions: [String]?)
 }
 
-public extension Transform {
+extension Transform {
   public static var defaultParameters: _Parameters {
     return (T: 262144, W: 0.5, M: 4.5, A: 0)
   }
@@ -105,6 +107,7 @@ public extension Transform {
       executing: scaling as ([Float]) -> [Float]
     )
   }
+
   public func unscale(_ sample: Sample, dimensions: [String]? = nil) {
     _mutate(
       sample, dimensions: dimensions,
