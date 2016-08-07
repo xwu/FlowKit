@@ -53,6 +53,7 @@
 		855AE2131D17509D00A87EE1 /* LogTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogTransform.swift; sourceTree = "<group>"; };
 		855AE2151D1755F100A87EE1 /* AsinhTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsinhTransform.swift; sourceTree = "<group>"; };
 		855AE2171D175AF300A87EE1 /* TransformTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformTests.swift; path = Tests/TransformTests.swift; sourceTree = SOURCE_ROOT; };
+		855BF8341D56E18600F08FCA /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		8568256F1D30C6A700556D92 /* Population.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Population.swift; sourceTree = "<group>"; };
 		856825711D30CA0400556D92 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gate.swift; sourceTree = "<group>"; };
 		856825731D30D38A00556D92 /* RectangularGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RectangularGate.swift; sourceTree = "<group>"; };
@@ -101,6 +102,7 @@
 		85C5CB761D15BFBD00FF5367 = {
 			isa = PBXGroup;
 			children = (
+				855BF8341D56E18600F08FCA /* LICENSE */,
 				85C5CBA41D15C56C00FF5367 /* Frameworks */,
 				85C5CB821D15BFBD00FF5367 /* Source */,
 				85C5CB8E1D15BFBD00FF5367 /* Tests */,
@@ -236,14 +238,14 @@
 					85C5CB7F1D15BFBD00FF5367 = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = FRC6CVKX9G;
-						DevelopmentTeamName = "Chiping Wu (Personal Team)";
+						DevelopmentTeamName = "Xiaodi Wu";
 						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 					85C5CB891D15BFBD00FF5367 = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = FRC6CVKX9G;
-						DevelopmentTeamName = "Chiping Wu (Personal Team)";
+						DevelopmentTeamName = "Xiaodi Wu";
 						ProvisioningStyle = Automatic;
 					};
 				};

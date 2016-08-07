@@ -3,7 +3,7 @@
 //  FlowKit
 //
 //  Ported by Xiaodi Wu on 12/22/15.
-//  Copyright © 2015-2016 Xiaodi Wu. All rights reserved.
+//  Copyright © 2015–2016 Xiaodi Wu. All rights reserved.
 //  Copyright © 2009, 2011, 2012 The Board of Trustees of The Leland Stanford
 //  Junior University. All rights reserved.
 //
