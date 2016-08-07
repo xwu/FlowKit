@@ -9,19 +9,36 @@
 import Foundation
 import Accelerate
 
-// These labels deliberately break with naming conventions because certain
-// lowercase letters are used in the specification to denote other parameters
-public typealias _Parameters = (T: Float, W: Float, M: Float, A: Float)
+public struct TransformParameters {
+  public static var `default` = TransformParameters(
+    T: 262144, W: 0.5, M: 4.5, A: 0
+  )
+
+  // These labels deliberately break with naming conventions because certain
+  // lowercase letters are used in the specification to denote other parameters
+  public let T: Float
+  public let W: Float
+  public let M: Float
+  public let A: Float
+
+  public init(_ T: Float, _ W: Float, _ M: Float, _ A: Float) {
+    self.T = T
+    self.W = W
+    self.M = M
+    self.A = A
+  }
+
+  public init(T: Float, W: Float, M: Float, A: Float) {
+    self.init(T, W, M, A)
+  }
+}
 
 public protocol Transform {
-  //FIXME: When typealias inside protocols become available, move _Parameters
-  //       here and remove the underscore
-  static var defaultParameters: _Parameters { get }
-  var parameters: _Parameters { get }
+  var parameters: TransformParameters { get }
   var bounds: (Float, Float)? { get }
   var domain: (Float, Float) { get }
 
-  init?(parameters: _Parameters, bounds: (Float, Float)?)
+  init?(_ parameters: TransformParameters, bounds: (Float, Float)?)
   init?(T: Float, W: Float, M: Float, A: Float, bounds: (Float, Float)?)
 
   func scaling(_ value: Float) -> Float
@@ -38,20 +55,19 @@ public protocol Transform {
 }
 
 extension Transform {
-  public static var defaultParameters: _Parameters {
-    return (T: 262144, W: 0.5, M: 4.5, A: 0)
-  }
-
   public var domain: (Float, Float) {
     return (unscaling(0), unscaling(1))
   }
 
   public init?(
-    T: Float = Self.defaultParameters.T, W: Float = Self.defaultParameters.W,
-    M: Float = Self.defaultParameters.M, A: Float = Self.defaultParameters.A,
+    T: Float = TransformParameters.default.T,
+    W: Float = TransformParameters.default.W,
+    M: Float = TransformParameters.default.M,
+    A: Float = TransformParameters.default.A,
     bounds: (Float, Float)? = nil
   ) {
-    self.init(parameters: (T, W, M, A), bounds: bounds)
+    let parameters = TransformParameters(T, W, M, A)
+    self.init(parameters, bounds: bounds)
   }
 
   public func clipping(_ value: Float) -> Float {

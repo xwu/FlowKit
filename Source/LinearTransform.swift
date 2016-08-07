@@ -10,11 +10,11 @@ import Foundation
 import Accelerate
 
 public struct LinearTransform : Transform {
-  public let parameters: _Parameters
+  public let parameters: TransformParameters
   public let bounds: (Float, Float)?
   internal let _sum: Float
 
-  public init?(parameters p: _Parameters, bounds: (Float, Float)?) {
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.A >= 0 && p.A <= p.T else { return nil }
     self.parameters = p
     self.bounds = bounds

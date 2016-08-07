@@ -43,7 +43,7 @@ public struct LogicleTransform : Transform {
   public static var defaultResolution = 4096
   public static let taylorPolynomialDegree = 16
 
-  public let parameters: _Parameters
+  public let parameters: TransformParameters
   public let bounds: (Float, Float)?
   public var dynamicRange: Float {
     return Float(_slope(1) / _slope(_x1))
@@ -62,7 +62,7 @@ public struct LogicleTransform : Transform {
   internal var _asinhToLogicleBins: [Double] = []
 
   public init?(
-    parameters p: _Parameters, bounds: (Float, Float)?, resolution: Int
+    _ p: TransformParameters, bounds: (Float, Float)?, resolution: Int
   ) {
     // Internally, we use double precision and adjust `A`
     let T = Double(p.T), W = Double(p.W), M = Double(p.M)
@@ -209,22 +209,19 @@ public struct LogicleTransform : Transform {
   }
 
   public init?(
-    T: Float = LogicleTransform.defaultParameters.T,
-    W: Float = LogicleTransform.defaultParameters.W,
-    M: Float = LogicleTransform.defaultParameters.M,
-    A: Float = LogicleTransform.defaultParameters.A,
+    T: Float = TransformParameters.default.T,
+    W: Float = TransformParameters.default.W,
+    M: Float = TransformParameters.default.M,
+    A: Float = TransformParameters.default.A,
     bounds: (Float, Float)? = nil, resolution: Int
   ) {
     self.init(
-      parameters: (T, W, M, A), bounds: bounds, resolution: resolution
+      TransformParameters(T, W, M, A), bounds: bounds, resolution: resolution
     )
   }
 
-  public init?(parameters p: _Parameters, bounds: (Float, Float)?) {
-    self.init(
-      parameters: p, bounds: bounds,
-      resolution: LogicleTransform.defaultResolution
-    )
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
+    self.init(p, bounds: bounds, resolution: LogicleTransform.defaultResolution)
   }
 
   internal func _seriesBiexponential(_ scaledValue: Double) -> Double {

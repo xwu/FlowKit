@@ -23,6 +23,27 @@ class TransformTests : XCTestCase {
     super.tearDown()
   }
 */
+  func testTransform() {
+    struct CustomTransform : Transform {
+      var parameters: TransformParameters
+      var bounds: (Float, Float)?
+      
+      init?(_ parameters: TransformParameters, bounds _: (Float, Float)?) {
+        self.parameters = parameters
+      }
+
+      func scaling(_ value: Float) -> Float {
+        return value
+      }
+
+      func unscaling(_ value: Float) -> Float {
+        return value
+      }
+    }
+    let ct = CustomTransform()!
+    XCTAssertEqual(ct.parameters.T, TransformParameters.default.T)
+  }
+
   func testLinearTransform() {
     let t0 = LinearTransform(T: 1000, A: 0)!
     XCTAssertEqualWithAccuracy(t0.scaling(-100), -0.1, accuracy: 0.000001)

@@ -10,10 +10,10 @@ import Foundation
 import Accelerate
 
 public struct LogTransform : Transform {
-  public let parameters: _Parameters
+  public let parameters: TransformParameters
   public let bounds: (Float, Float)?
 
-  public init?(parameters p: _Parameters, bounds: (Float, Float)?) {
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.M > 0 else { return nil }
     self.parameters = p
     self.bounds = bounds

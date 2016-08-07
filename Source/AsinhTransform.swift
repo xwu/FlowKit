@@ -10,13 +10,13 @@ import Foundation
 import Accelerate
 
 public struct AsinhTransform : Transform {
-  public let parameters: _Parameters
+  public let parameters: TransformParameters
   public let bounds: (Float, Float)?
   // `_b` and `_x2` correspond to their counterparts in `LogicleTransform`
   // `_e` was chosen because it's not a parameter used in `LogicleTransform`
   internal let _b, _e, _x2: Float
 
-  public init?(parameters p: _Parameters, bounds: (Float, Float)?) {
+  public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.M > 0 && p.A >= 0 && p.A <= p.M else { return nil }
     self.parameters = p
     self.bounds = bounds
