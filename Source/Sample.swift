@@ -155,7 +155,7 @@ public final class Sample {
   */
   public internal(set) var events: [String : [Float]] = [:]
 
-  /// Creates a new `Sample` from the given `Sample`.
+  /// Initialize a new `Sample` from the given `Sample`.
   public init(_ sample: Sample) {
     header = sample.header
     keywords = sample.keywords
@@ -190,7 +190,7 @@ public final class Sample {
   }
 
   /**
-    Creates a new `Sample` by parsing the given data.
+    Initialize a new `Sample` by parsing the given data.
 
     - Parameter data: The data to be parsed.
     - Parameter offset: The byte offset from which to begin parsing the given

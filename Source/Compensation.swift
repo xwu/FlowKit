@@ -9,12 +9,48 @@
 import Foundation
 import Accelerate
 
+/**
+  A compensation or spillover matrix to correct flow cytometry data for spectral
+  emission overlap.
+
+  You can create a compensation matrix based on keyword data from a given sample
+  or from a row-major array of coefficients.
+*/
 public struct Compensation {
+  /**
+    The short names for uncompensated parameters, which are the columns of the
+    compensation matrix (unless inverted).
+  */
   public let detectors: [String]
+
+  /**
+    The optional short names for compensated parameters, which are the rows of
+    the compensation matrix (unless inverted). If specified, they must be
+    distinct from the short names of uncompensated parameters; if unspecified,
+    compensated parameters use the same names as their uncompensated
+    counterparts.
+  */
   public let fluorochromes: [String]?
-  public let matrix: [Float] /* row-major */
+
+  /**
+    The coefficients for the compensation matrix in _row-major_ order.
+  */
+  public let matrix: [Float]
+
+  /**
+    Indicates whether `matrix` is considered to hold the (pseudo)inverse of the
+    compensation matrix.
+  */
   public let isInverted: Bool
 
+  /**
+    Create the acquisition matrix of the given sample. The matrix must be square
+    and coefficients must be finite.
+
+    - Note: The matrix is created using the value for the first key in the
+      following list contained in the sample's keywords: $SPILLOVER, SPILL,
+      $COMP, SPILLOVER, $SPILL, COMP.
+  */
   public init?(_ sample: Sample) {
     let keys = ["$SPILLOVER", "SPILL", "$COMP", "SPILLOVER", "$SPILL", "COMP"]
     var strings = [String]()
@@ -31,13 +67,14 @@ public struct Compensation {
     guard strings.count - 1 == count * (1 + count) else { return nil }
     let detectors = [String](strings[1...count])
     let matrix = strings.suffix(from: count + 1).map { Float($0) ?? Float.nan }
-    // All matrix entries must be finite
+    // All matrix coefficients must be finite
     guard
       matrix.count == (matrix.filter { $0.isFinite }.count)
       else { return nil }
     self.init(detectors: detectors, matrix: matrix)
   }
 
+  /// Create a new compensation matrix with the given properties.
   public init(
     detectors: [String], fluorochromes: [String]? = nil,
     matrix: [Float], isInverted: Bool = false
@@ -88,7 +125,17 @@ public struct Compensation {
     return (parameters, result)
   }
 
+  /**
+    Spectrally unmix the given sample using the receiver. If successful,
+    compensated event data, separated by parameter, are stored in
+    `sample.events` and keyed either to fluorochrome names if they are specified
+    or detector names otherwise.
+
+    - Note: Overdetermined systems (i.e., non-square compensation matrices) are
+      not currently supported.
+  */
   public func unmix(_ sample: Sample) {
+    //TODO: Throw if unmixing is unsuccessful
     guard let (parameters, matrix) = _unscramble(for: sample) else { return }
     var result: [Float]
 
