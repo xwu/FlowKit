@@ -17,11 +17,6 @@ internal extension Data {
         ptr.advanced(by: position), to: UnsafePointer<T>.self
       ).pointee
     }
-    /*
-    return unsafeBitCast(
-      bytes.advanced(by: position), to: UnsafePointer<T>.self
-    ).pointee
-    */
   }
 }
 
@@ -51,8 +46,29 @@ internal func _parse(
   return dict
 }
 
-//MARK:
+// MARK: -
+
+/**
+  A flow cytometry data set in an FCS data file.
+
+  You can initialize a `Sample` object with an existing instance or FCS data.
+  Upon initialization, each sample is compensated using the acquisition matrix,
+  if available. Note that event data cannot be accessed unless compensation has
+  been applied.
+
+  ```
+  let control = Sample(x) // Assuming `x` is an instance of `Data`.
+  let transform = LinearTransform()!
+  transform.scale(control, dimensions: ["FSC-A"])
+  let values = control.events["FSC-A"]!
+  ```
+
+  - Note: Only list mode data sets not stored as ASCII text are supported. See
+    documentation for the `Sample.keyword` property for information on other
+    keyword requirements for correct parsing.
+*/
 public final class Sample {
+  /// Options for creating a `Sample` object from FCS data.
   public struct ReadingOptions: OptionSet {
     public let rawValue: Int
 
@@ -60,19 +76,86 @@ public final class Sample {
       self.rawValue = rawValue
     }
 
+    /**
+      Causes integer data to be scaled using an anti-logarithmic transform based
+      on values given in $P\[_n_\]E keywords.
+    */
     public static let transform = ReadingOptions(rawValue: 1)
+
+    /**
+      Causes integer, non-logarithmic data to be scaled to account for the gain
+      used to amplify the signal, based on values given in $P\[_n_\]G keywords.
+    */
     public static let scaleUsingGain = ReadingOptions(rawValue: 2)
-    // public static let scaleToUnitRange = ReadOptions(rawValue: 4)
+
+    // public static let scaleToUnitRange = ReadingOptions(rawValue: 4)
+
+    /**
+      Causes keyword values to be parsed strictly in accordance with the FCS3.1
+      standard, which stipulates that keyword values cannot be empty (i.e., "")
+      and that two consecutive delimiter characters (e.g., "//" if the delimiter
+      character is "/") are an escape sequence.
+    */
     public static let forbidEmptyKeywordValues = ReadingOptions(rawValue: 8)
   }
 
+  /**
+    The HEADER segment of the data set, comprising: (1) a version identifier
+    string (e.g., "FCS3.1"); and (2) three pairs of strings indicating byte
+    offsets for the first and last (not one-past-the-end) byte of the primary
+    TEXT segment, DATA segment, and ANALYSIS segment of the data set.
+
+    - Note: Offsets for any user-defined OTHER segments are not parsed.
+  */
   public let header: [String]
+
+  /**
+    The keywords (key-value pairs) stored in the primary and supplemental TEXT
+    segments of the data set. Keys beginning with "$" are defined in the FCS
+    standard, while others are user-defined.
+
+    For correct parsing of event data, at minimum, the following keywords must
+    be defined in the data set:
+    * $MODE---Data mode. Only list mode ("L") is supported.
+    * $DATATYPE---Type of data stored in the DATA segment. Only integer ("I")
+      and floating point ("D" and "F") types are supported.
+    * $BYTEORD---Byte order for data. Only little endian ("1,2,3,4" or "1,2")
+      and big endian ("4,3,2,1" or "2,1") byte orders are supported (and not,
+      for example, "1,3,2,4").
+    * $PAR---Number of parameters in an event.
+    * $TOT---Total number of events in the data set.
+    * $P\[_n_\]N---Short name for parameter _n_.
+
+    - Note: For integer data, keywords $P\[_n_\]B (number of bits reserved for
+      parameter _n_) must also be defined and must be 8, 16, 32, or 64.
+  */
   public let keywords: [String : String]
+
+  /**
+    Parameter short names, given by keywords $P\[_n_\]N, in ascending order of
+    their parameter number _n_.
+
+    Since Swift arrays are zero-based, `parameters[0] == keywords["$P1N"]!`. The
+    corresponding (optional) long name would be expressed as `keywords["$P1S"]`.
+  */
   public let parameters: [String]
   internal let _rawEvents: [Float]
+
+  /**
+    The total number of parsed events in the data set. If
+    `count != Int(keywords["$TOT"]!)!`, then the data may have been prematurely
+    truncated in a corrupted file.
+  */
   public let count: Int
+
+  /**
+    The parsed and compensated event data, before or after transforms have been
+    applied. Data are separated by parameter and keyed to parameter short names
+    or, after compensation using a Gating-ML–defined matrix, fluorochrome names.
+  */
   public internal(set) var events: [String : [Float]] = [:]
 
+  /// Creates a new `Sample` from the given `Sample`.
   public init(_ sample: Sample) {
     header = sample.header
     keywords = sample.keywords
@@ -106,6 +189,15 @@ public final class Sample {
     events = e
   }
 
+  /**
+    Creates a new `Sample` by parsing the given data.
+
+    - Parameter data: The data to be parsed.
+    - Parameter offset: The byte offset from which to begin parsing the given
+      data. This parameter would need to be non-zero when parsing a data set
+      other than the first in a file containing more than one data set.
+    - Parameter options: Options for parsing the given data.
+  */
   public init?(
     _ data: Data, offset: Int = 0, options: ReadingOptions = .transform
   ) {
