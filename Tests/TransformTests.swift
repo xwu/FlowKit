@@ -28,8 +28,9 @@ class TransformTests : XCTestCase {
       var parameters: TransformParameters
       var bounds: (Float, Float)?
       
-      init?(_ parameters: TransformParameters, bounds _: (Float, Float)?) {
+      init?(_ parameters: TransformParameters, bounds: (Float, Float)?) {
         self.parameters = parameters
+        self.bounds = bounds
       }
 
       func scaling(_ value: Float) -> Float {

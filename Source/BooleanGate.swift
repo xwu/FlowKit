@@ -9,10 +9,17 @@
 import Foundation
 import Accelerate
 
-public struct BooleanGate: Gate {
+/**
+  A Boolean gate.
+
+  NOT gates subset a population based on a single other gate. AND, OR, and XOR
+  (exclusive or) gates subset a population based on two or more other gates.
+*/
+public struct BooleanGate : Gate {
+  /// A Boolean gate operation.
   public enum Operation {
     case not, and, or, xor
-    // Xor is not supported in Gating-ML, but we'll support it
+    // XOR is not supported in Gating-ML, but we'll support it
   }
 
   public var dimensions: [String] {
@@ -20,9 +27,20 @@ public struct BooleanGate: Gate {
     for g in gates { s.formUnion(g.dimensions) }
     return [String](s)
   }
+
+  /// The operation for the Boolean gate.
   public let operation: Operation
+
+  /// The other gate(s) on which the Boolean gate is based.
   public let gates: [Gate]
 
+  /**
+    Create a Boolean gate that uses the given operation, based on the given
+    gates.
+
+    - Parameter operation: The Boolean gate operation to be used.
+    - Parameter gates: The other gate(s) on which to base the Boolean gate.
+  */
   public init(operation: Operation, gates: [Gate]) {
     precondition(operation == .not ? gates.count == 1 : gates.count > 1)
     self.operation = operation
@@ -33,7 +51,7 @@ public struct BooleanGate: Gate {
     guard var mask = gates.first?.masking(population)?.mask else { return nil }
     switch operation {
     case .not:
-      // Each not gate can only reference one other gate
+      // Each NOT gate can only reference one other gate
       // Note that we must mask the parent population and not the root sample
       vDSP_vsmsa(
         mask, 1, [-1 as Float], [1 as Float], &mask, 1, UInt(mask.count)

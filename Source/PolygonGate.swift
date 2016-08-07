@@ -8,14 +8,36 @@
 
 import Foundation
 
+/**
+  A polygon gate in two dimensions.
+
+  The polygon is automatically closed, events on its boundary are considered to
+  be in the gate, and the interior of the polygon is determined by the even–odd
+  winding rule.
+*/
 public struct PolygonGate : Gate {
   public typealias Vertex = (x: Float, y: Float)
+
+  /// The maximum supported number of vertices in a polygon.
   public static let maxVertexCount = 46340
   // `46340 * 46340 < Int32.max`, whereas `46341 * 46341 > Int(Int32.max)`
 
   public let dimensions: [String]
+
+  /// The vertices of the polygon; edges are drawn between consecutive vertices.
   public let vertices: [Vertex]
 
+  /**
+    Create a (two-dimensional) polygon gate with the given dimensions and
+    vertices.
+
+    - Parameter dimensions: The dimensions to be gated. These names can be
+      parameter short names (FCS terminology) or, equivalently, detector names
+      (Gating-ML terminology), and they can be fluorochrome names (Gating-ML
+      terminology) after compensation using a non-acquisition-defined matrix.
+    - Parameter vertices: The vertices of the polygon; edges are drawn between
+      consecutive vertices.
+  */
   public init(dimensions: [String], vertices: [Vertex]) {
     precondition(dimensions.count == 2)
     precondition(vertices.count <= PolygonGate.maxVertexCount)

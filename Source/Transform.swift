@@ -57,7 +57,7 @@ public struct TransformParameters {
   A parameterized scaling transform.
 
   When you scale a dimension of a `Sample` (i.e., a parameter (FCS terminology),
-  fluorochrome, or detector (Gating-ML terminology)), unscaled event values are
+  fluorochrome, or detector (Gating-ML terminology)), unscaled values are
   replaced by their scaled counterparts. Likewise, when you unscale a dimension,
   scaled values are replaced by their unscaled counterparts.
 
@@ -191,7 +191,7 @@ public protocol Transform {
 
     - Precondition: The given dimensions must be present in the sample.
     - Parameter sample: The given sample.
-    - Parameter dimensions: The names of dimensions to be scaled; these can be
+    - Parameter dimensions: The names of dimensions to be scaled; they can be
       parameter short names (FCS terminology) or, equivalently, detector names
       (Gating-ML terminology), and they can be fluorochrome names (Gating-ML
       terminology) after compensation using a non-acquisition-defined matrix.
@@ -208,7 +208,7 @@ public protocol Transform {
 
     - Precondition: The given dimensions must be present in the sample.
     - Parameter sample: The given sample.
-    - Parameter dimensions: The names of dimensions to be unscaled; these can be
+    - Parameter dimensions: The names of dimensions to be unscaled; they can be
     parameter short names (FCS terminology) or, equivalently, detector names
     (Gating-ML terminology), and they can be fluorochrome names (Gating-ML
     terminology) after compensation using a non-acquisition-defined matrix.
@@ -223,7 +223,7 @@ public protocol Transform {
 
     - Precondition: The given dimensions must be present in the sample.
     - Parameter sample: The given sample.
-    - Parameter dimensions: The names of dimensions to be clipped; these can be
+    - Parameter dimensions: The names of dimensions to be clipped; they can be
     parameter short names (FCS terminology) or, equivalently, detector names
     (Gating-ML terminology), and they can be fluorochrome names (Gating-ML
     terminology) after compensation using a non-acquisition-defined matrix.

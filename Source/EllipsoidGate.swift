@@ -9,16 +9,66 @@
 import Foundation
 import Accelerate
 
+/**
+  An ellipsoid gate in two or more dimensions.
+
+  The gate is defined by a vector of means _μ_ and a covariance matrix _C_,
+  where an event, represented as _x_ in the space where _μ_ is defined, is in
+  the gate if and only if _x_ is in
+  
+  ```
+  G(μ, C, D^2) = { x : transpose(x - μ) * inverse(C) * (x - μ) <= D^2 }
+  ```
+  
+  For a two-dimensional ellipse gate, half-axis lengths and rotation are
+  computed to aid interpretation.
+*/
 public struct EllipsoidGate : Gate {
   public let dimensions: [String]
+
+  /// The vector of means _μ_.
   public let means: [Float]
+
+  /// The covariance matrix _C_, which must be symmetric and positive-definite.
   public let covariances: [Float]
+
+  /// The square of the Mahalanobis distance (_D_^2).
   public let distanceSquared: Float
+
   internal let _lowerTriangle: [Float]?
+
+  // ---------------------------------------------------------------------------
   // The following properties are computed only for two-dimensional gates
+  // ---------------------------------------------------------------------------
+
+  /**
+    The length of the semi-major and semi-minor axes of a two-dimensional
+    (ellipse) gate; `nil` if the gate has more than two dimensions.
+  */
   public let halfAxes: (Float, Float)?
+
+  /**
+    The rotation, in radians, of a two-dimensional (ellipse) gate; `nil` if the
+    gate has more than two dimensions.
+  */
   public let rotation: Float?
 
+  /**
+    Create an ellipsoid gate with the given dimensions, vector of means,
+    covariance matrix, and squared Mahalanobis distance.
+
+    - Note: You can create an `EllipsoidGate` with a covariance matrix that is
+      not symmetric and positive-definite, but every gating operation will give
+      a result of `nil`.
+
+    - Parameter dimensions: The dimensions to be gated. These names can be
+      parameter short names (FCS terminology) or, equivalently, detector names
+      (Gating-ML terminology), and they can be fluorochrome names (Gating-ML
+      terminology) after compensation using a non-acquisition-defined matrix.
+    - Parameter means: The vector of means _μ_.
+    - Parameter covariances: The covariance matrix _C_.
+    - Parameter distanceSquared: The square of the Mahalanobis distance (_D_^2).
+  */
   public init(
     dimensions: [String],
     means: [Float], covariances: [Float], distanceSquared: Float
