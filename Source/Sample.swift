@@ -116,6 +116,7 @@ public final class Sample {
 
     For correct parsing of event data, at minimum, the following keywords must
     be defined in the data set:
+
     * $MODE---Data mode. Only list mode ("L") is supported.
     * $DATATYPE---Type of data stored in the DATA segment. Only integer ("I")
       and floating point ("D" and "F") types are supported.
