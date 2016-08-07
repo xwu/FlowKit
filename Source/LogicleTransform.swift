@@ -39,15 +39,35 @@
 import Foundation
 import Accelerate
 
+/**
+  A parameterized Logicle transform, described in Moore and Parks, _Cytometry A_
+  81A(4): 273–7 (2012).
+
+  To create a Logicle transform, the following conditions must be met by the
+  given parameters: _T_ > 0, _M_ > 0, 0 <= _W_ <= _M_/2, and
+  -W <= _A_ <= _M_ - 2*_W_. If _W_ = 0, this transform is equivalent to an
+  inverse hyperbolic sine (asinh) transform.
+
+  - SeeAlso: `TransformParameters`, `LogicleTransform`
+*/
 public struct LogicleTransform : Transform {
+  /// The default resolution for approximating results for a Logicle transform.
   public static var defaultResolution = 4096
+  /// The degree of the Taylor polynomial for computing the quasi-linear region.
   public static let taylorPolynomialDegree = 16
 
   public let parameters: TransformParameters
   public let bounds: (Float, Float)?
+
+  /**
+    The dynamic range of the Logicle scale, computed as the ratio of the most
+    compression (at the top of scale) to the least compression (at the center of
+    the quasi-linear region).
+  */
   public var dynamicRange: Float {
     return Float(_slope(1) / _slope(_x1))
   }
+
   internal let _resolution: Int
   // Note that `_e` is not a parameter used in `LogicleTransform`
   // See comment in `AsinhTransform`

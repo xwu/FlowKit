@@ -9,6 +9,21 @@
 import Foundation
 import Accelerate
 
+/**
+  A parameterized inverse hyperbolic sine transform.
+
+  The transform is defined by the function
+
+  ```
+  fasinh(x, T, M, A) = (asinh(x * sinh(M * ln(10)) / T) + A * ln(10)) / ((M + A) * ln(10))
+  ```
+
+  where _x_ is an unscaled real value, _T_ > 0, _M_ > 0, and 0 <= _A_ <= _M_.
+  This transform is equivalent to a Logicle transform with parameters
+  (_T_, 0, _M_, _A_).
+
+  - SeeAlso: `TransformParameters`, `LogicleTransform`
+*/
 public struct AsinhTransform : Transform {
   public let parameters: TransformParameters
   public let bounds: (Float, Float)?

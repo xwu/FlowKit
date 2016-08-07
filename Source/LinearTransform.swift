@@ -9,10 +9,23 @@
 import Foundation
 import Accelerate
 
+/**
+  A parameterized linear transform.
+
+  The transform is defined by the function
+
+  ```
+  flin(x, T, A) = (x + A) / (T + A)
+  ```
+
+  where _x_ is an unscaled real value, _T_ > 0 and 0 < _A_ < _T_.
+
+  - SeeAlso: `TransformParameters`
+*/
 public struct LinearTransform : Transform {
   public let parameters: TransformParameters
   public let bounds: (Float, Float)?
-  internal let _sum: Float
+  internal let _sum: Float // T + A
 
   public init?(_ p: TransformParameters, bounds: (Float, Float)?) {
     guard p.T > 0 && p.A >= 0 && p.A <= p.T else { return nil }

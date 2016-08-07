@@ -9,6 +9,19 @@
 import Foundation
 import Accelerate
 
+/**
+  A parameterized logarithmic transform.
+
+  The transform is defined by the function
+
+  ```
+  flin(x, T, M) = (1 / M) * log10(x / T) + 1
+  ```
+
+  where _x_ is an unscaled real value, _T_ > 0 and _M_ > 0.
+
+  - SeeAlso: `TransformParameters`
+*/
 public struct LogTransform : Transform {
   public let parameters: TransformParameters
   public let bounds: (Float, Float)?
