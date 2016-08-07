@@ -19,6 +19,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 
+Implements portions of the International Society for Advancement of Cytometry
+(ISAC) Data File Standard for Flow Cytometry (FCS) and Standard for Representing
+Gating Descriptions in Flow Cytometry (Gating-ML). Copyright © 2008–2009,
+2006–2015 ISAC.
+
+The work may be used under the terms of the Creative Commons
+Attribution-ShareAlike 3.0 Unported license. You are free to share (copy,
+distribute and transmit), and adapt the work under the conditions specified
+at <http://creativecommons.org/licenses/by-sa/3.0/legalcode>.
+
+--------------------------------------------------------------------------------
+
 Portions implementing the Logicle transform are copyright © 2009, 2011, 2012 The
 Board of Trustees of The Leland Stanford Junior University. All rights reserved.
 
