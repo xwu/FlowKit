@@ -151,8 +151,8 @@ class GateTests: XCTestCase {
     // Test for correctness
     let population = gate.masking(s)!
     XCTAssertEqual(
-      String(population.mask![0..<8]),
-      String([0 as Float, 1, 0, 1, 1, 0, 1, 1])
+      String(describing: population.mask![0..<8]),
+      String(describing: [0 as Float, 1, 0, 1, 1, 0, 1, 1])
     )
     /*
     XCTAssertEqual("\(population.mask![0..<8])", "01011011")
