@@ -50,10 +50,8 @@ internal extension UInt32 {
   }
 }
 
-internal func << <
-  T : BidirectionalCollection
-  where T.Iterator.Element == UInt32, T.IndexDistance == Int
->(lhs: T, rhs: Int) -> [UInt32] {
+internal func << <T : BidirectionalCollection>(lhs: T, rhs: Int) -> [UInt32]
+where T.Iterator.Element == UInt32, T.IndexDistance == Int {
   precondition(rhs >= 0 && rhs < 32)
   if rhs == 0 { return [UInt32](lhs) }
 
@@ -141,7 +139,7 @@ public struct BitVector {
   public internal(set) var buckets: [Bucket] = []
   public let count: Int
 
-  public init<S : Sequence where S.Iterator.Element == Bit>(_ s: S) {
+  public init<S : Sequence>(_ s: S) where S.Iterator.Element == Bit {
     let raw = s.map { $0.rawValue }
     self.init(raw)
   }

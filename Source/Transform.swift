@@ -284,7 +284,7 @@ extension Transform {
 
   internal func _mutate(
     _ sample: Sample, dimensions: [String]? = nil,
-    executing: @noescape ([Float]) -> [Float]
+    executing: ([Float]) -> [Float]
   ) {
     let k = [String](sample.events.keys)
     let dimensions = dimensions?.filter { k.contains($0) } ?? k

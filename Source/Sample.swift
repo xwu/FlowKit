@@ -316,7 +316,7 @@ public final class Sample {
         else { return nil }
       switch dataType {
       case "D":
-        let size = strideof(Double.self)
+        let size = MemoryLayout<Double>.stride
         rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
         //FIXME: We assume that endianness for floating point and integer types
         //       are the same, which is a safe assumption for most modern
@@ -339,7 +339,7 @@ public final class Sample {
           }
         }
       case "F":
-        let size = strideof(Float.self)
+        let size = MemoryLayout<Float>.stride
         rawEvents = [Float](repeating: Float.nan, count: subdata.count / size)
         //FIXME: We assume that endianness for floating point and integer types
         //       are the same, which is a safe assumption for most modern
