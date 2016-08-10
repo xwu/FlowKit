@@ -52,9 +52,10 @@ internal func _parse(
   A flow cytometry data set in an FCS data file.
 
   You can initialize a `Sample` object with an existing instance or FCS data.
-  Upon initialization, each sample is compensated using the acquisition matrix,
-  if available. Note that event data cannot be accessed unless compensation has
-  been applied.
+  Note that event data cannot be accessed unless compensation has been applied.
+  By default, each sample is compensated using its acquisition matrix upon
+  initialization with FCS data. You can disable this behavior by specifying
+  custom reading options.
 
   ```
   let control = Sample(x) // Assuming `x` is an instance of `Data`.
@@ -97,6 +98,13 @@ public final class Sample {
       character is "/") are an escape sequence.
     */
     public static let forbidEmptyKeywordValues = ReadingOptions(rawValue: 8)
+
+    /**
+      Causes parsed event data to be compensated using the sample's acquisition
+      matrix, if one can be found.
+    */
+    public static let compensateUsingAcquisitionMatrix =
+      ReadingOptions(rawValue: 16)
   }
 
   /**
@@ -200,7 +208,8 @@ public final class Sample {
     - Parameter options: Options for parsing the given data.
   */
   public init?(
-    _ data: Data, offset: Int = 0, options: ReadingOptions = .transform
+    _ data: Data, offset: Int = 0,
+    options: ReadingOptions = [.transform, .compensateUsingAcquisitionMatrix]
   ) {
     // Parse header
     let header = [0, 10, 18, 26, 34, 42, 50].map { i -> String in
@@ -478,8 +487,8 @@ public final class Sample {
     _rawEvents = rawEvents
     self.count = count
 
-    // If possible, compensate using acquisition matrix
-    if let compensation = Compensation(self) {
+    if options.contains(.compensateUsingAcquisitionMatrix),
+      let compensation = Compensation(self) {
       compensation.unmix(self)
     }
   }
