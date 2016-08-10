@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		850724D81D59A4C30002AC8E /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 850724D71D59A4C30002AC8E /* README.md */; };
 		854A7D981D31851500FC4681 /* GateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854A7D971D31851500FC4681 /* GateTests.swift */; };
 		855482E71D31DAC50000367D /* PolygonGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855482E61D31DAC50000367D /* PolygonGate.swift */; };
 		855AE2101D1737C000A87EE1 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855AE20F1D1737C000A87EE1 /* Transform.swift */; };
@@ -47,7 +46,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		850724D71D59A4C30002AC8E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		854A7D971D31851500FC4681 /* GateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GateTests.swift; sourceTree = "<group>"; };
 		855482E61D31DAC50000367D /* PolygonGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolygonGate.swift; sourceTree = "<group>"; };
 		855AE20F1D1737C000A87EE1 /* Transform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transform.swift; sourceTree = "<group>"; };
@@ -55,7 +53,6 @@
 		855AE2131D17509D00A87EE1 /* LogTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogTransform.swift; sourceTree = "<group>"; };
 		855AE2151D1755F100A87EE1 /* AsinhTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsinhTransform.swift; sourceTree = "<group>"; };
 		855AE2171D175AF300A87EE1 /* TransformTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransformTests.swift; path = Tests/TransformTests.swift; sourceTree = SOURCE_ROOT; };
-		855BF8341D56E18600F08FCA /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		8568256F1D30C6A700556D92 /* Population.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Population.swift; sourceTree = "<group>"; };
 		856825711D30CA0400556D92 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gate.swift; sourceTree = "<group>"; };
 		856825731D30D38A00556D92 /* RectangularGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RectangularGate.swift; sourceTree = "<group>"; };
@@ -104,8 +101,6 @@
 		85C5CB761D15BFBD00FF5367 = {
 			isa = PBXGroup;
 			children = (
-				855BF8341D56E18600F08FCA /* LICENSE */,
-				850724D71D59A4C30002AC8E /* README.md */,
 				85C5CBA41D15C56C00FF5367 /* Frameworks */,
 				85C5CB821D15BFBD00FF5367 /* Source */,
 				85C5CB8E1D15BFBD00FF5367 /* Tests */,
@@ -300,7 +295,6 @@
 				856825781D30D3E100556D92 /* BooleanGate.swift in Sources */,
 				855AE2101D1737C000A87EE1 /* Transform.swift in Sources */,
 				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
-				850724D81D59A4C30002AC8E /* README.md in Sources */,
 				85A8F5F21D321AB900271C3D /* Histogram.swift in Sources */,
 				855AE2121D174AFC00A87EE1 /* LinearTransform.swift in Sources */,
 				855482E71D31DAC50000367D /* PolygonGate.swift in Sources */,
