@@ -70,11 +70,11 @@ where T.Iterator.Element == UInt32, T.IndexDistance == Int {
   return result
 }
 
-public enum Bit : UInt8 {
+internal enum Bit : UInt8 {
   case zero = 0, one
 }
 
-public struct BitVector {
+internal struct BitVector {
   public typealias Bucket = UInt32
 
   public static func packing(_ a: [UInt8]) -> [Bucket] {
@@ -367,56 +367,58 @@ extension BitVector : CustomStringConvertible {
 }
 
 // MARK: Bitwise operations
-public func & (lhs: BitVector, rhs: BitVector) -> BitVector {
-  precondition(lhs.count == rhs.count)
-  var l = lhs.buckets
-  for i in 0..<l.count {
-    l[i] &= rhs.buckets[i]
+extension BitVector {
+  public static func & (lhs: BitVector, rhs: BitVector) -> BitVector {
+    precondition(lhs.count == rhs.count)
+    var l = lhs.buckets
+    for i in 0..<l.count {
+      l[i] &= rhs.buckets[i]
+    }
+    return BitVector(buckets: l, count: lhs.count)
   }
-  return BitVector(buckets: l, count: lhs.count)
-}
 
-public func &= (lhs: inout BitVector, rhs: BitVector) {
-  precondition(lhs.count == rhs.count)
-  for i in 0..<lhs.buckets.count {
-    lhs.buckets[i] &= rhs.buckets[i]
+  public static func &= (lhs: inout BitVector, rhs: BitVector) {
+    precondition(lhs.count == rhs.count)
+    for i in 0..<lhs.buckets.count {
+      lhs.buckets[i] &= rhs.buckets[i]
+    }
   }
-}
 
-public func | (lhs: BitVector, rhs: BitVector) -> BitVector {
-  precondition(lhs.count == rhs.count)
-  var l = lhs.buckets
-  for i in 0..<l.count {
-    l[i] |= rhs.buckets[i]
+  public static func | (lhs: BitVector, rhs: BitVector) -> BitVector {
+    precondition(lhs.count == rhs.count)
+    var l = lhs.buckets
+    for i in 0..<l.count {
+      l[i] |= rhs.buckets[i]
+    }
+    return BitVector(buckets: l, count: lhs.count)
   }
-  return BitVector(buckets: l, count: lhs.count)
-}
 
-public func |= (lhs: inout BitVector, rhs: BitVector) {
-  precondition(lhs.count == rhs.count)
-  for i in 0..<lhs.buckets.count {
-    lhs.buckets[i] |= rhs.buckets[i]
+  public static func |= (lhs: inout BitVector, rhs: BitVector) {
+    precondition(lhs.count == rhs.count)
+    for i in 0..<lhs.buckets.count {
+      lhs.buckets[i] |= rhs.buckets[i]
+    }
   }
-}
 
-public func ^ (lhs: BitVector, rhs: BitVector) -> BitVector {
-  precondition(lhs.count == rhs.count)
-  var l = lhs.buckets
-  for i in 0..<l.count {
-    l[i] ^= rhs.buckets[i]
+  public static func ^ (lhs: BitVector, rhs: BitVector) -> BitVector {
+    precondition(lhs.count == rhs.count)
+    var l = lhs.buckets
+    for i in 0..<l.count {
+      l[i] ^= rhs.buckets[i]
+    }
+    return BitVector(buckets: l, count: lhs.count)
   }
-  return BitVector(buckets: l, count: lhs.count)
-}
 
-public func ^= (lhs: inout BitVector, rhs: BitVector) {
-  precondition(lhs.count == rhs.count)
-  for i in 0..<lhs.buckets.count {
-    lhs.buckets[i] ^= rhs.buckets[i]
+  public static func ^= (lhs: inout BitVector, rhs: BitVector) {
+    precondition(lhs.count == rhs.count)
+    for i in 0..<lhs.buckets.count {
+      lhs.buckets[i] ^= rhs.buckets[i]
+    }
   }
-}
 
-public prefix func ~ (x: BitVector) -> BitVector {
-  var x = x
-  x.flip()
-  return x
+  public static prefix func ~ (x: BitVector) -> BitVector {
+    var x = x
+    x.flip()
+    return x
+  }
 }
