@@ -129,13 +129,13 @@
 				855AE2131D17509D00A87EE1 /* LogTransform.swift */,
 				855AE2151D1755F100A87EE1 /* AsinhTransform.swift */,
 				8592A0421D18852E001EDB65 /* LogicleTransform.swift */,
-				85C208EE1D28DFB0001031D8 /* BitVector.swift */,
 				8568256F1D30C6A700556D92 /* Population.swift */,
 				856825711D30CA0400556D92 /* Gate.swift */,
 				856825731D30D38A00556D92 /* RectangularGate.swift */,
 				856825751D30D3AF00556D92 /* EllipsoidGate.swift */,
 				855482E61D31DAC50000367D /* PolygonGate.swift */,
 				856825771D30D3E100556D92 /* BooleanGate.swift */,
+				85C208EE1D28DFB0001031D8 /* BitVector.swift */,
 				85A8F5F11D321AB900271C3D /* Histogram.swift */,
 			);
 			path = Source;
