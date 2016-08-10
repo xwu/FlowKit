@@ -1,10 +1,10 @@
 # FlowKit
 
-FlowKit is a library for analyzing flow cytometry data, written in Swift 3.
+A library for analyzing flow cytometry data, written in Swift 3.
 
 ## Requirements
 
-- OS X 10.11+
+- macOS 10.11+
 - Xcode 8.0+
 
 ## Installation
@@ -93,7 +93,7 @@ Rectangular gates can have one or more dimensions and ellipsoid gates can have t
 
 ### Advanced Usage
 
-In the examples above, a sample _parameter_ is also called a gating _dimension_, which can be a _detector_ dimension (e.g., FITC-A) or a compensated _fluorochrome_ dimension (e.g., CD4). These terms are defined in standards from the International Society for Advancement of Cytometry (ISAC).
+In the examples above, a sample _parameter_ is also called a gating _dimension_, which can be a _detector_ dimension (e.g., FITC-A) or a compensated _fluorochrome_ dimension (e.g., CD4). These and other terms are defined in standards from the International Society for Advancement of Cytometry (ISAC).
 
 For advanced usage of FlowKit, you may find it helpful to consult the following standards:
 
