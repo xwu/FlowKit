@@ -12,10 +12,8 @@ import Accelerate
 // MARK: Convenience functions
 internal extension Data {
   func unsafeValue<T: UnsignedInteger>(at position: Int) -> T {
-    return withUnsafeBytes { (ptr: UnsafePointer<Void>) in
-      unsafeBitCast(
-        ptr.advanced(by: position), to: UnsafePointer<T>.self
-      ).pointee
+    return withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in
+      return UnsafeRawPointer(ptr).load(fromByteOffset: position, as: T.self)
     }
   }
 }
