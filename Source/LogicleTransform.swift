@@ -51,13 +51,25 @@ import Accelerate
   - SeeAlso: `TransformParameters`, `LogicleTransform`
 */
 public struct LogicleTransform : Transform {
-  /// The default resolution for approximating results for a Logicle transform.
+  /**
+    The default resolution (i.e., number of precomputed bins) to be used for
+    approximating the results of a Logicle transform.
+  */
   public static var defaultResolution = 4096
   /// The degree of the Taylor polynomial for computing the quasi-linear region.
   public static let taylorPolynomialDegree = 16
 
   public let parameters: TransformParameters
   public let bounds: (Float, Float)?
+  /**
+    The number of precomputed bins to be used for approximating the results of
+    the Logicle transform.
+
+    - Note: If `resolution == 0`, then precomputed bins are not used to compute
+      the results of the Logicle transform. However, all methods that scale or
+      unscale an array of values are preconditioned on `resolution > 0`.
+  */
+  public let resolution: Int
 
   /**
     The dynamic range of the Logicle scale, computed as the ratio of the most
@@ -68,7 +80,6 @@ public struct LogicleTransform : Transform {
     return Float(_slope(1) / _slope(_x1))
   }
 
-  internal let _resolution: Int
   // Note that `_e` is not a parameter used in `LogicleTransform`
   // See comment in `AsinhTransform`
   internal let _a, _b, _c, _d, _e, _f, _w, _x0, _x1, _x2: Double
@@ -84,7 +95,8 @@ public struct LogicleTransform : Transform {
   public init?(
     _ p: TransformParameters, bounds: (Float, Float)?, resolution: Int
   ) {
-    // Internally, we use double precision and adjust `A`
+    // Internally, we use double precision and, if `resolution > 0`, we adjust
+    // `A` so that zero is on a bin boundary
     let T = Double(p.T), W = Double(p.W), M = Double(p.M)
     var A = Double(p.A)
     if resolution > 0 {
@@ -95,7 +107,7 @@ public struct LogicleTransform : Transform {
     // guard T > 0 && M > 0 && A >= 0 && A <= M else { return nil }
     self.parameters = p
     self.bounds = bounds
-    _resolution = resolution
+    self.resolution = resolution
 
     // Initialize actual parameters (formulas from biexponential paper)
     _w = W / (M + A)
@@ -304,45 +316,45 @@ public struct LogicleTransform : Transform {
 
 /*
   internal func _binning(_ value: Double) -> Int? {
-    guard _resolution > 0 else { return nil }
+    guard resolution > 0 else { return nil }
     // Binary search for appropriate bin
-    var lo = 0, hi = _resolution
+    var lo = 0, hi = resolution
     while lo <= hi {
       let mid = (lo + hi) >> 1, key = _bins[mid]
       if value < key {
         hi = mid - 1
       } else if value > key {
         lo = mid + 1
-      } else if mid < _resolution {
+      } else if mid < resolution {
         return mid
       } else {
         return nil
       }
     }
     // Check range
-    if hi < 0 || lo > _resolution { return nil }
+    if hi < 0 || lo > resolution { return nil }
     return lo - 1
   }
 
   internal func _unbinning(_ index: Int) -> Double? {
-    // This `guard` condition also covers the case where `_resolution == 0`
-    guard index >= 0 && index < _resolution else { return nil }
+    // This `guard` condition also covers the case where `resolution == 0`
+    guard index >= 0 && index < resolution else { return nil }
     return _bins[index]
   }
 */
 
   public func scaling(_ value: Float) -> Float {
     let value = Double(value)
-    if _resolution > 0 {
+    if resolution > 0 {
       /*
       if let i = _binning(value) {
         let delta = (value - _bins[i]) / (_bins[i + 1] - _bins[i])
-        return clipping(Float((Double(i) + delta) / Double(_resolution)))
+        return clipping(Float((Double(i) + delta) / Double(resolution)))
       }
       */
       let a = (asinh(value * _e) / _b) + _x2
       if a >= -1 && a <= 1 {
-        let p = a * Double(_resolution) + Double(_resolution), q = floor(p)
+        let p = a * Double(resolution) + Double(resolution), q = floor(p)
         let index = Int(q), delta = p - q
         let interpolation = (1 - delta) * _asinhToLogicleBins[index] +
           delta * _asinhToLogicleBins[index + 1]
@@ -354,11 +366,11 @@ public struct LogicleTransform : Transform {
 
   public func unscaling(_ value: Float) -> Float {
     let value = Double(clipping(value))
-    if _resolution > 0 {
+    if resolution > 0 {
       // Find the bin
-      let x = value * Double(_resolution)
+      let x = value * Double(resolution)
       let i = Int(floor(x))
-      if i >= 0 && i < _resolution {
+      if i >= 0 && i < resolution {
         // Interpolate linearly
         let delta = x - Double(i)
         return Float((1 - delta) * _bins[i] + delta * _bins[i + 1])
@@ -368,14 +380,14 @@ public struct LogicleTransform : Transform {
   }
 
   public func scaling(_ values: [Float]) -> [Float] {
-    precondition(_resolution > 0)
+    precondition(resolution > 0)
     //TODO: Handle input values not in domain
     /*
     var indices = [Double](repeating: 0, count: values.count)
     let lower = _unscalingWithoutClipping(0)
     let upper = _unscalingWithoutClipping(1)
     let difference = upper - lower
-    let resolution = _resolution
+    let resolution = resolution
     outer: for i in 0..<values.count {
       let value = Double(values[i])
       let j = Int((value - lower) / difference * Double(resolution))
@@ -442,7 +454,7 @@ public struct LogicleTransform : Transform {
     vvasinh(&v6, v5, [c]) // This cannot be done in-place
     vDSP_vsmsaD(v6, 1, [ib], [x2], &v6, 1, UInt(v4.count))
     // Interpolate
-    let s = Double(_resolution), m = UInt(_asinhToLogicleBins.count)
+    let s = Double(resolution), m = UInt(_asinhToLogicleBins.count)
     vDSP_vtabiD(v6, 1, [s], [s], _asinhToLogicleBins, m, &v6, 1, UInt(v4.count))
     // DP to SP
     vDSP_vdpsp(v6, 1, &v7, 1, UInt(v4.count))
@@ -450,14 +462,14 @@ public struct LogicleTransform : Transform {
   }
 
   public func unscaling(_ values: [Float]) -> [Float] {
-    precondition(_resolution > 0)
+    precondition(resolution > 0)
     //TODO: Handle input values less than 0 or greater than 1
     var v0 = clipping(values)
     // SP to DP
     var v1 = [Double](repeating: 0, count: v0.count)
     vDSP_vspdp(v0, 1, &v1, 1, UInt(v0.count))
     // Find the bin and interpolate linearly
-    let s = Double(_resolution)
+    let s = Double(resolution)
     vDSP_vtabiD(
       v1, 1, [s], [0 as Double],
       _bins, UInt(_bins.count), &v1, 1, UInt(v0.count)
@@ -477,7 +489,7 @@ extension LogicleTransform : Equatable {
       lhs.parameters.W == rhs.parameters.W &&
       lhs.parameters.M == rhs.parameters.M &&
       lhs.parameters.A == rhs.parameters.A &&
-      lhs._resolution == rhs._resolution
+      lhs.resolution == rhs.resolution
     )
   }
 }
