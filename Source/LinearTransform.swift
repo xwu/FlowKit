@@ -58,3 +58,14 @@ public struct LinearTransform : Transform {
     return result
   }
 }
+
+extension LinearTransform : Equatable {
+  public static func == (lhs: LinearTransform, rhs: LinearTransform) -> Bool {
+    let unbounded = (-Float.infinity, Float.infinity)
+    return (
+      (lhs.bounds ?? unbounded) == (rhs.bounds ?? unbounded) &&
+      lhs.parameters.T == rhs.parameters.T &&
+      lhs.parameters.A == rhs.parameters.A
+    )
+  }
+}

@@ -71,3 +71,15 @@ public struct AsinhTransform : Transform {
     return result
   }
 }
+
+extension AsinhTransform : Equatable {
+  public static func == (lhs: AsinhTransform, rhs: AsinhTransform) -> Bool {
+    let unbounded = (-Float.infinity, Float.infinity)
+    return (
+      (lhs.bounds ?? unbounded) == (rhs.bounds ?? unbounded) &&
+      lhs.parameters.T == rhs.parameters.T &&
+      lhs.parameters.M == rhs.parameters.M &&
+      lhs.parameters.A == rhs.parameters.A
+    )
+  }
+}

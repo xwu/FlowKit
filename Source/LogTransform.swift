@@ -64,3 +64,14 @@ public struct LogTransform : Transform {
     return result
   }
 }
+
+extension LogTransform : Equatable {
+  public static func == (lhs: LogTransform, rhs: LogTransform) -> Bool {
+    let unbounded = (-Float.infinity, Float.infinity)
+    return (
+      (lhs.bounds ?? unbounded) == (rhs.bounds ?? unbounded) &&
+      lhs.parameters.T == rhs.parameters.T &&
+      lhs.parameters.M == rhs.parameters.M
+    )
+  }
+}

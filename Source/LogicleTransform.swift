@@ -467,3 +467,17 @@ public struct LogicleTransform : Transform {
     return v0
   }
 }
+
+extension LogicleTransform : Equatable {
+  public static func == (lhs: LogicleTransform, rhs: LogicleTransform) -> Bool {
+    let unbounded = (-Float.infinity, Float.infinity)
+    return (
+      (lhs.bounds ?? unbounded) == (rhs.bounds ?? unbounded) &&
+      lhs.parameters.T == rhs.parameters.T &&
+      lhs.parameters.W == rhs.parameters.W &&
+      lhs.parameters.M == rhs.parameters.M &&
+      lhs.parameters.A == rhs.parameters.A &&
+      lhs._resolution == rhs._resolution
+    )
+  }
+}
