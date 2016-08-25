@@ -88,17 +88,18 @@ public struct Compensation {
     self.isInverted = isInverted
   }
 
-  internal func _unscramble(for sample: Sample) -> ([String], [Float])? {
+  internal func _unscramble(for parameters: [String]) -> ([String], [Float])? {
+    // We'll eventually mutate `parameters` by substituting fluorochrome names
+    // (if any) for detector names
+    var parameters = parameters
+
     let d = detectors.count
     let f = (fluorochromes ?? detectors).count
-    let p = sample.parameters.count
-    let map = detectors.map { sample.parameters.index(of: $0) }.flatMap { $0 }
-    // We cannot proceed if any detector is not found in the sample's parameters
+    let p = parameters.count
+    let map = detectors.map { parameters.index(of: $0) }.flatMap { $0 }
+    // We cannot proceed if any detector is not found among `parameters`
     guard d == map.count else { return nil }
 
-    // Make a copy of `sample.parameters`, to be modified by substituting
-    // fluorochrome names (if any) for detector names
-    var parameters = sample.parameters
     // Set up an identity matrix so that parameters not being unmixed are
     // preserved after compensation is applied
     var result = [Float](repeating: 0, count: p * p)
@@ -136,7 +137,9 @@ public struct Compensation {
   */
   public func unmix(_ sample: Sample) {
     //TODO: Throw if unmixing is unsuccessful
-    guard let (parameters, matrix) = _unscramble(for: sample) else { return }
+    guard
+      let (parameters, matrix) = _unscramble(for: sample.parameters)
+      else { return }
     var result: [Float]
 
     if isInverted {
@@ -201,5 +204,29 @@ public struct Compensation {
         result[i * sample.count..<(i + 1) * sample.count]
       )
     }
+  }
+}
+
+extension Compensation : Equatable {
+  public static func == (lhs: Compensation, rhs: Compensation) -> Bool {
+    // For simplicity, let's not try to compute a matrix inverse and determine
+    // whether coefficients are _approximately_ equal
+    guard lhs.isInverted == rhs.isInverted else { return false }
+
+    // If detectors are listed in the same order, then the comparison is simple
+    if lhs.detectors == rhs.detectors {
+      let f0 = lhs.fluorochromes ?? lhs.detectors
+      let f1 = rhs.fluorochromes ?? rhs.detectors
+      return f0 == f1 && lhs.matrix == rhs.matrix
+    }
+
+    // Get a rearranged list of fluorochromes and a rearranged matrix for `lhs`
+    // after matching the order of detectors to that of `rhs`; if any detectors
+    // in `rhs` aren't found in `lhs`, then `_unscramble(for:)` returns nil
+    guard
+      lhs.detectors.count == rhs.detectors.count,
+      let (f0, m0) = lhs._unscramble(for: rhs.detectors)
+      else { return false }
+    return f0 == (rhs.fluorochromes ?? rhs.detectors) && m0 == rhs.matrix
   }
 }

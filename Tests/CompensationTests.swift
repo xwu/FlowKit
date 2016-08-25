@@ -48,8 +48,8 @@ class CompensationTests : XCTestCase {
     )
     XCTAssertEqual(compensation.detectors, inverted.detectors)
     XCTAssertEqual(
-      compensation._unscramble(for: sample)!.0,
-      inverted._unscramble(for: sample)!.0
+      compensation._unscramble(for: sample.parameters)!.0,
+      inverted._unscramble(for: sample.parameters)!.0
     )
     // Make two copies so that each can be manipulated independently
     let copy1 = Sample(sample), copy2 = Sample(sample)
@@ -62,6 +62,17 @@ class CompensationTests : XCTestCase {
         XCTAssertLessThanOrEqual(abs(v1[i] - v2[i]), abs(v1[i] / 100000))
       }
     }
+  }
+
+  func testCompensationEquatability() {
+    guard let sample = sample else { return }
+    let compensation = Compensation(sample)!
+    let (parameters, matrix) =
+      compensation._unscramble(for: compensation.detectors.reversed())!
+    let scrambled = Compensation(
+      detectors: parameters, matrix: matrix, isInverted: compensation.isInverted
+    )
+    XCTAssertTrue(compensation == scrambled)
   }
 /*
   func testPerformanceExample() {
