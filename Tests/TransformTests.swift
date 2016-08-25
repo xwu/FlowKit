@@ -302,6 +302,56 @@ class TransformTests : XCTestCase {
       print(result[42])
     }
   }
+
+  func testTransformEquatability() {
+    let lin0 = LinearTransform(T: 10, W: 12, M: 14, A: 5)!
+    let lin1 = LinearTransform(T: 10, W: 4, M: 6, A: 5)!
+    let lin2 = LinearTransform(T: 10, A: 5)!
+    let lin3 = LinearTransform(T: 10, A: 0)!
+    XCTAssertTrue(lin0 == lin1)
+    XCTAssertTrue(lin0 == lin2)
+    XCTAssertFalse(lin0 == lin3)
+
+    let log0 = LogTransform(T: 10, W: -2, M: 12, A: 2)!
+    let log1 = LogTransform(T: 10, W: -4, M: 12, A: 4)!
+    let log2 = LogTransform(T: 10, M: 12)!
+    let log3 = LogTransform(T: 10, M: 2)!
+    XCTAssertTrue(log0 == log1)
+    XCTAssertTrue(log0 == log2)
+    XCTAssertFalse(log0 == log3)
+
+    let asinh0 = AsinhTransform(T: 10, W: -2, M: 12, A: 2)!
+    let asinh1 = AsinhTransform(T: 10, W: -4, M: 12, A: 2)!
+    let asinh2 = AsinhTransform(T: 10, M: 12, A: 2)!
+    let asinh3 = AsinhTransform(T: 10, M: 12, A: 4)!
+    XCTAssertTrue(asinh0 == asinh1)
+    XCTAssertTrue(asinh0 == asinh2)
+    XCTAssertFalse(asinh0 == asinh3)
+
+    let lgcl0 = LogicleTransform(T: 10, W: 2, M: 6, A: 0)!
+    let lgcl1 = LogicleTransform(T: 10, W: 2, M: 6, A: 0.5)!
+    let lgcl2 = LogicleTransform(T: 10, W: 1, M: 6, A: 0)!
+    XCTAssertFalse(lgcl0 == lgcl1)
+    XCTAssertFalse(lgcl0 == lgcl2)
+
+    let lgcl3 = LogicleTransform(
+      T: 10, W: 2, M: 6, A: 0, bounds: (-Float.infinity, Float.infinity)
+    )!
+    let lgcl4 = LogicleTransform(
+      T: 10, W: 2, M: 6, A: 0, bounds: (0, Float.infinity)
+    )!
+    XCTAssertTrue(lgcl0 == lgcl3)
+    XCTAssertFalse(lgcl0 == lgcl4)
+
+    let lgcl5 = LogicleTransform(
+      T: 10, W: 2, M: 6, A: 0, resolution: LogicleTransform.defaultResolution
+    )!
+    let lgcl6 = LogicleTransform(
+      T: 10, W: 2, M: 6, A: 0, resolution: 0
+    )!
+    XCTAssertTrue(lgcl0 == lgcl5)
+    XCTAssertFalse(lgcl0 == lgcl6)
+  }
 /*
   func testPerformanceExample() {
     // This is an example of a performance test case
