@@ -108,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				85BF4D001D754C8A00654892 /* Descriptor.swift */,
+				85A8F5F11D321AB900271C3D /* Histogram.swift */,
 				85BF4D011D754C8A00654892 /* ParserDelegate.swift */,
 				85BF4D021D754C8A00654892 /* Tree.swift */,
 			);
@@ -152,7 +153,6 @@
 				855482E61D31DAC50000367D /* PolygonGate.swift */,
 				856825771D30D3E100556D92 /* BooleanGate.swift */,
 				85C208EE1D28DFB0001031D8 /* BitVector.swift */,
-				85A8F5F11D321AB900271C3D /* Histogram.swift */,
 				85BF4CFF1D754C3D00654892 /* Analysis */,
 			);
 			path = Source;
