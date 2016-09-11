@@ -25,7 +25,7 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
   // It's safe to keep a strong reference to the parser, because the parser
   // keeps an unowned reference to its delegate
   internal var currentParser: XMLParser? = nil
-  internal var currentEntity: Entity? = nil
+  internal var currentDescriptor: Descriptor? = nil
   internal var currentNumbers: [Double?] = []
   internal var currentStrings: [String?] = []
   internal var currentCharacters: String = ""
@@ -82,23 +82,26 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
     // Transforms
     case "spectrumMatrix":
       let name = attribute("transforms", "id")
-      let entity = CompensationEntity(name: name)
+      let entity = CompensationDescriptor(name: name)
       if
         let i = attribute("transforms", "matrix-inverted-already"),
         i.lowercased().trimmingCharacters(in: .whitespaces) == "true" {
         entity.isInverted = true
       }
-      currentEntity = entity
-    case "detectors", "fluorochromes", "spectrum": break
+      currentDescriptor = entity
+    case "detectors", "fluorochromes":
+      currentStrings = []
+    case "spectrum":
+      currentNumbers = []
     case "coefficient":
       let value = Double(attribute("transforms", "value") ?? "")
       currentNumbers.append(value ?? .nan)
     case "transformation":
       // We don't yet know whether this is a Transform or a DerivedDimension
       let name = attribute("transforms", "id")
-      currentStrings.append(name)
+      currentStrings = [name]
     case "flin", "flog", "fasinh", "logicle", "hyperlog":
-      let entity = TransformEntity(name: currentStrings.first ?? nil)
+      let entity = TransformDescriptor(name: currentStrings.first ?? nil)
       currentStrings = []
       entity.T = Double(attribute("transforms", "T") ?? "")
       entity.W = Double(attribute("transforms", "W") ?? "")
@@ -112,78 +115,84 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
         (name == "logicle")  ? .logicle  :
         (name == "hyperlog") ? .hyperlog : .other(name)
       // TODO: How are bounds described in Gating-ML?
-      currentEntity = entity
+      currentDescriptor = entity
     case "fratio":
-      let entity = DerivedDimensionEntity(name: currentStrings.first ?? nil)
+      let entity = DerivedDimensionDescriptor(name: currentStrings.first ?? nil)
       currentStrings = []
       entity.A = Double(attribute("transforms", "A") ?? "")
       entity.B = Double(attribute("transforms", "B") ?? "")
       entity.C = Double(attribute("transforms", "C") ?? "")
-      currentEntity = entity
+      currentDescriptor = entity
 
     // Gating
     case "RectangleGate":
       let name = attribute("gating", "id")
-      let entity = RectangleGateEntity(name: name)
+      let entity = RectangleGateDescriptor(name: name)
       entity.parent = attribute("gating", "parent_id")
-      currentEntity = entity
+      currentDescriptor = entity
     case "PolygonGate":
       let name = attribute("gating", "id")
-      let entity = PolygonGateEntity(name: name)
+      let entity = PolygonGateDescriptor(name: name)
       entity.parent = attribute("gating", "parent_id")
-      currentEntity = entity
+      currentDescriptor = entity
     case "EllipsoidGate":
       let name = attribute("gating", "id")
-      let entity = EllipsoidGateEntity(name: name)
+      let entity = EllipsoidGateDescriptor(name: name)
       entity.parent = attribute("gating", "parent_id")
-      currentEntity = entity
+      currentDescriptor = entity
     case "QuadrantGate":
       let name = attribute("gating", "id")
-      let entity = QuadrantGateEntity(name: name)
+      let entity = QuadrantGateDescriptor(name: name)
       entity.parent = attribute("gating", "parent_id")
-      currentEntity = entity
+      currentDescriptor = entity
     case "BooleanGate":
       let name = attribute("gating", "id")
-      let entity = BooleanGateEntity(name: name)
+      let entity = BooleanGateDescriptor(name: name)
       entity.parent = attribute("gating", "parent_id")
-      currentEntity = entity
-    case "dimension", "divider":
-      if let entity = currentEntity as? GateEntity {
+      currentDescriptor = entity
+    case "divider":
+      currentNumbers = []
+      fallthrough
+    case "dimension":
+      currentStrings = []
+      if let entity = currentDescriptor as? GateDescriptor {
         let compensation = attribute("gating", "compensation-ref") ?? ""
         let transform = attribute("gating", "transformation-ref") ?? ""
         entity.compensations.append(compensation)
         entity.transforms.append(transform)
       }
-      if let entity = currentEntity as? RectangleGateEntity {
+      if let entity = currentDescriptor as? RectangleGateDescriptor {
         let min = Double(attribute("gating", "min") ?? "")
         let max = Double(attribute("gating", "max") ?? "")
         entity.ranges.append((min ?? -.infinity)..<(max ?? .infinity))
       }
-      if let entity = currentEntity as? QuadrantGateEntity {
+      if let entity = currentDescriptor as? QuadrantGateDescriptor {
         let name = attribute("gating", "id")
         entity.dimensionReferenceNames.append(name ?? "")
       }
-    case "vertex": break
-    case "mean": break
+    case "vertex", "mean":
+      currentNumbers = []
     case "coordinate", "entry":
       let value = Double(attribute("data-type", "value") ?? "")
       currentNumbers.append(value ?? .nan)
-    case "covarianceMatrix", "row": break
+    case "covarianceMatrix":
+      currentNumbers = []
+    case "row": break
     case "distanceSquare":
       let value = Double(attribute("data-type", "value") ?? "")
-      if let entity = currentEntity as? EllipsoidGateEntity {
+      if let entity = currentDescriptor as? EllipsoidGateDescriptor {
         entity.distanceSquared = value
       }
     case "value":
-      currentCharacters = "" // Clear previous characters found during parsing
-      break
+      currentCharacters = ""
     case "Quadrant":
+      currentNumbers = []
       let name = attribute("gating", "id")
-      currentStrings.append(name)
+      currentStrings = [name]
     case "position":
       if
         let reference = attribute("gating", "divider_ref"),
-        let entity = currentEntity as? QuadrantGateEntity,
+        let entity = currentDescriptor as? QuadrantGateDescriptor,
         let index = entity.dimensionReferenceNames.index(of: reference) {
         // Make sure we have enough room in our array
         if index >= currentNumbers.count {
@@ -194,14 +203,14 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
         currentNumbers[index] = location
       }
     case "not", "and", "or":
-      if let entity = currentEntity as? BooleanGateEntity {
+      if let entity = currentDescriptor as? BooleanGateDescriptor {
         entity.operation =
           (name == "not") ? .not :
           (name == "and") ? .and :
           .or
       }
     case "gateReference":
-      if let entity = currentEntity as? BooleanGateEntity {
+      if let entity = currentDescriptor as? BooleanGateDescriptor {
         let name = attribute("gating", "ref")
         let complement: Bool
         if
@@ -231,35 +240,35 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
     // Transforms
     case "spectrumMatrix":
       #if DEBUG
-        debugPrint(currentEntity!)
+        debugPrint(currentDescriptor!)
       #endif
-      // TODO: Add CompensationEntity to an array
+      // TODO: Add CompensationDescriptor to an array
       break
     case "detectors":
-      if let entity = currentEntity as? CompensationEntity {
+      if let entity = currentDescriptor as? CompensationDescriptor {
         entity.detectors = currentStrings.flatMap { $0 }
       }
       currentStrings = []
     case "fluorochromes":
-      if let entity = currentEntity as? CompensationEntity {
+      if let entity = currentDescriptor as? CompensationDescriptor {
         entity.fluorochromes = currentStrings.flatMap { $0 }
       }
       currentStrings = []
     case "spectrum":
-      if let entity = currentEntity as? CompensationEntity {
+      if let entity = currentDescriptor as? CompensationDescriptor {
         entity.matrix += currentNumbers.flatMap { $0 }
       }
       currentNumbers = []
     case "coefficient": break
     case "transformation":
       #if DEBUG
-        debugPrint(currentEntity!)
+        debugPrint(currentDescriptor!)
       #endif
-      // TODO: Add TransformEntity or DerivedDimensionEntity to an array
+      // TODO: Add TransformDescriptor or DerivedDimensionDescriptor to an array
       break
     case "flin", "flog", "fasinh", "logicle", "hyperlog": break
     case "fratio":
-      if let entity = currentEntity as? DerivedDimensionEntity {
+      if let entity = currentDescriptor as? DerivedDimensionDescriptor {
         entity.function = .fratio
         entity.dimensions = currentStrings.flatMap { $0 }
       }
@@ -270,18 +279,18 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
       fallthrough
     case "QuadrantGate", "BooleanGate":
       #if DEBUG
-        debugPrint(currentEntity!)
+        debugPrint(currentDescriptor!)
       #endif
-      // TODO: Add GateEntity to an array
+      // TODO: Add GateDescriptor to an array
       break
     case "divider":
-      if let entity = currentEntity as? QuadrantGateEntity {
+      if let entity = currentDescriptor as? QuadrantGateDescriptor {
         entity.dividers.append(currentNumbers.flatMap { $0 })
       }
       currentNumbers = []
       fallthrough
     case "dimension":
-      if let entity = currentEntity as? GateEntity {
+      if let entity = currentDescriptor as? GateDescriptor {
         let strings = currentStrings.flatMap { $0 }
         // We expect that each gating:dimension contains either one
         // data-type:fcs-dimension or one data-type:new-dimension
@@ -291,19 +300,19 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
     case "vertex":
       if
         currentNumbers.count > 1,
-        let entity = currentEntity as? PolygonGateEntity {
+        let entity = currentDescriptor as? PolygonGateDescriptor {
         let vertex = (currentNumbers[0] ?? .nan, currentNumbers[1] ?? .nan)
         entity.vertices.append(vertex)
       }
       currentNumbers = []
     case "mean":
-      if let entity = currentEntity as? EllipsoidGateEntity {
+      if let entity = currentDescriptor as? EllipsoidGateDescriptor {
         entity.means = currentNumbers.flatMap { $0 }
       }
       currentNumbers = []
     case "coordinate", "entry": break
     case "covarianceMatrix":
-      if let entity = currentEntity as? EllipsoidGateEntity {
+      if let entity = currentDescriptor as? EllipsoidGateDescriptor {
         entity.covariances = currentNumbers.flatMap { $0 }
       }
       currentNumbers = []
@@ -316,7 +325,7 @@ internal final class ParserDelegate : NSObject, XMLParserDelegate {
     case "Quadrant":
       let name = (currentStrings.first ?? "") ?? ""
       currentStrings = []
-      if let entity = currentEntity as? QuadrantGateEntity {
+      if let entity = currentDescriptor as? QuadrantGateDescriptor {
         entity.quadrants.append((name, currentNumbers))
       }
       currentNumbers = []

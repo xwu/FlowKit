@@ -22,7 +22,7 @@
 		8592A0431D18852E001EDB65 /* LogicleTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8592A0421D18852E001EDB65 /* LogicleTransform.swift */; };
 		85A8F5F21D321AB900271C3D /* Histogram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A8F5F11D321AB900271C3D /* Histogram.swift */; };
 		85A8F5F41D32325000271C3D /* HistogramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A8F5F31D32325000271C3D /* HistogramTests.swift */; };
-		85BF4D031D754C8A00654892 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BF4D001D754C8A00654892 /* Entity.swift */; };
+		85BF4D031D754C8A00654892 /* Descriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BF4D001D754C8A00654892 /* Descriptor.swift */; };
 		85BF4D041D754C8A00654892 /* ParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BF4D011D754C8A00654892 /* ParserDelegate.swift */; };
 		85BF4D051D754C8A00654892 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BF4D021D754C8A00654892 /* Tree.swift */; };
 		85C208EF1D28DFB0001031D8 /* BitVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C208EE1D28DFB0001031D8 /* BitVector.swift */; };
@@ -64,9 +64,9 @@
 		8592A0421D18852E001EDB65 /* LogicleTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogicleTransform.swift; sourceTree = "<group>"; };
 		85A8F5F11D321AB900271C3D /* Histogram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Histogram.swift; sourceTree = "<group>"; };
 		85A8F5F31D32325000271C3D /* HistogramTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistogramTests.swift; sourceTree = "<group>"; };
-		85BF4D001D754C8A00654892 /* Entity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Entity.swift; path = Analysis/Entity.swift; sourceTree = "<group>"; };
-		85BF4D011D754C8A00654892 /* ParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ParserDelegate.swift; path = Analysis/ParserDelegate.swift; sourceTree = "<group>"; };
-		85BF4D021D754C8A00654892 /* Tree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Tree.swift; path = Analysis/Tree.swift; sourceTree = "<group>"; };
+		85BF4D001D754C8A00654892 /* Descriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Descriptor.swift; sourceTree = "<group>"; };
+		85BF4D011D754C8A00654892 /* ParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParserDelegate.swift; sourceTree = "<group>"; };
+		85BF4D021D754C8A00654892 /* Tree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 		85C208EE1D28DFB0001031D8 /* BitVector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitVector.swift; sourceTree = "<group>"; };
 		85C208F01D28E871001031D8 /* BitVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitVectorTests.swift; path = Tests/BitVectorTests.swift; sourceTree = SOURCE_ROOT; };
 		85C5CB801D15BFBD00FF5367 /* FlowKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FlowKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -107,7 +107,7 @@
 		85BF4CFF1D754C3D00654892 /* Analysis */ = {
 			isa = PBXGroup;
 			children = (
-				85BF4D001D754C8A00654892 /* Entity.swift */,
+				85BF4D001D754C8A00654892 /* Descriptor.swift */,
 				85BF4D011D754C8A00654892 /* ParserDelegate.swift */,
 				85BF4D021D754C8A00654892 /* Tree.swift */,
 			);
@@ -312,7 +312,7 @@
 				85BF4D051D754C8A00654892 /* Tree.swift in Sources */,
 				85C5CB9B1D15C10600FF5367 /* Sample.swift in Sources */,
 				856825781D30D3E100556D92 /* BooleanGate.swift in Sources */,
-				85BF4D031D754C8A00654892 /* Entity.swift in Sources */,
+				85BF4D031D754C8A00654892 /* Descriptor.swift in Sources */,
 				855AE2101D1737C000A87EE1 /* Transform.swift in Sources */,
 				85DF309F1D15FE03001E846B /* Compensation.swift in Sources */,
 				85A8F5F21D321AB900271C3D /* Histogram.swift in Sources */,

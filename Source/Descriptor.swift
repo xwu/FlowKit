@@ -1,5 +1,5 @@
 //
-//  Entity.swift
+//  Descriptor.swift
 //  FlowKit
 //
 //  Created by Xiaodi Wu on 8/28/16.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-/* open */ internal class Entity : CustomDebugStringConvertible {
+/* open */ internal class Descriptor : CustomDebugStringConvertible {
   public var uuid: UUID
   public var name: String?
 
@@ -19,15 +19,15 @@ import Foundation
 
   open var debugDescription : String {
     let empty = ""
-    return "Entity(name: \(name ?? empty))"
+    return "Descriptor(name: \(name ?? empty))"
   }
 }
 
-/* open */ internal class DerivedDimensionEntity : Entity {
+/* open */ internal class DerivedDimensionDescriptor : Descriptor {
   public enum Function {
     case fratio, other(String)
   }
-  public var function: DerivedDimensionEntity.Function? = .fratio
+  public var function: DerivedDimensionDescriptor.Function? = .fratio
   public var dimensions: [String] = []
   public var A: Double? = nil
   public var B: Double? = nil
@@ -38,7 +38,7 @@ import Foundation
     let f = (function == nil) ? empty : String(describing: function!)
     let p = "{ A: \(A ?? .nan), B: \(B ?? .nan), C: \(C ?? .nan) }"
     let lines = [
-      "DerivedDimensionEntity(",
+      "DerivedDimensionDescriptor(",
       "  name: \(name ?? empty)",
       "  function: \(f)",
       "  dimensions: \(dimensions)",
@@ -49,7 +49,7 @@ import Foundation
   }
 }
 
-/* open */ internal class CompensationEntity : Entity {
+/* open */ internal class CompensationDescriptor : Descriptor {
   public var detectors: [String] = []
   public var fluorochromes: [String] = []
   public var matrix: [Double] = []
@@ -58,7 +58,7 @@ import Foundation
   open override var debugDescription: String {
     let empty = ""
     let lines = [
-      "CompensationEntity(",
+      "CompensationDescriptor(",
       "  name: \(name ?? empty)",
       "  detectors: \(detectors)",
       "  fluorochromes: \(fluorochromes)",
@@ -70,11 +70,11 @@ import Foundation
   }
 }
 
-/* open */ internal class TransformEntity : Entity {
+/* open */ internal class TransformDescriptor : Descriptor {
   public enum Function {
     case flin, flog, fasinh, logicle, hyperlog, other(String)
   }
-  public var function: TransformEntity.Function? = nil
+  public var function: TransformDescriptor.Function? = nil
   public var T: Double? = nil
   public var W: Double? = nil
   public var M: Double? = nil
@@ -87,7 +87,7 @@ import Foundation
     let p = "{ T: \(T ?? .nan), W: \(W ?? .nan), M: \(M ?? .nan), A: \(A ?? .nan) }"
     let b = (bounds == nil) ? empty : String(describing: bounds!)
     let lines = [
-      "TransformEntity(",
+      "TransformDescriptor(",
       "  name: \(name ?? empty)",
       "  function: \(f)",
       "  parameters: \(p)",
@@ -98,7 +98,7 @@ import Foundation
   }
 }
 
-/* open */ internal class GateEntity : Entity {
+/* open */ internal class GateDescriptor : Descriptor {
   public var parent: String? = nil
   public var dimensions: [String] = []
   public var compensations: [String] = []
@@ -107,7 +107,7 @@ import Foundation
   open override var debugDescription: String {
     let empty = ""
     let lines = [
-      "GateEntity(",
+      "GateDescriptor(",
       "  name: \(name ?? empty)",
       "  parent: \(parent ?? empty)",
       "  dimensions: \(dimensions)",
@@ -119,14 +119,14 @@ import Foundation
   }
 }
 
-/* open */ internal class RectangleGateEntity : GateEntity {
+/* open */ internal class RectangleGateDescriptor : GateDescriptor {
   public var ranges: [Range<Double>] = []
 
   open override var debugDescription: String {
     let empty = ""
     let r = ranges.map { ($0.lowerBound, $0.upperBound) }
     let lines = [
-      "RectangleGateEntity(",
+      "RectangleGateDescriptor(",
       "  name: \(name ?? empty)",
       "  parent: \(parent ?? empty)",
       "  dimensions: \(dimensions)",
@@ -139,13 +139,13 @@ import Foundation
   }
 }
 
-/* open */ internal class PolygonGateEntity : GateEntity {
+/* open */ internal class PolygonGateDescriptor : GateDescriptor {
   public var vertices: [(x: Double, y: Double)] = []
 
   open override var debugDescription: String {
     let empty = ""
     let lines = [
-      "PolygonGateEntity(",
+      "PolygonGateDescriptor(",
       "  name: \(name ?? empty)",
       "  parent: \(parent ?? empty)",
       "  dimensions: \(dimensions)",
@@ -158,7 +158,7 @@ import Foundation
   }
 }
 
-/* open */ internal class EllipsoidGateEntity : GateEntity {
+/* open */ internal class EllipsoidGateDescriptor : GateDescriptor {
   public var means: [Double] = []
   public var covariances: [Double] = []
   public var distanceSquared: Double? = nil
@@ -166,7 +166,7 @@ import Foundation
   open override var debugDescription: String {
     let empty = ""
     let lines = [
-      "EllipsoidGateEntity(",
+      "EllipsoidGateDescriptor(",
       "  name: \(name ?? empty)",
       "  parent: \(parent ?? empty)",
       "  dimensions: \(dimensions)",
@@ -181,7 +181,7 @@ import Foundation
   }
 }
 
-/* open */ internal class QuadrantGateEntity : GateEntity {
+/* open */ internal class QuadrantGateDescriptor : GateDescriptor {
   public var dimensionReferenceNames: [String] = []
   public var dividers: [[Double]] = []
   // Uniquely, a quadrant can be defined without specifying all coordinates; in
@@ -198,7 +198,7 @@ import Foundation
         }.joined(separator: ", ") + "]"
       }.joined(separator: ", ") + " }"
     let lines = [
-      "QuadrantGateEntity(",
+      "QuadrantGateDescriptor(",
       "  name: \(name ?? empty)",
       "  parent: \(parent ?? empty)",
       "  dimensions: \(dimensions)",
@@ -212,7 +212,7 @@ import Foundation
   }
 }
 
-/* open */ internal class BooleanGateEntity : GateEntity {
+/* open */ internal class BooleanGateDescriptor : GateDescriptor {
   public var operation: BooleanGate.Operation? = nil
   public var gates: [(name: String, complement: Bool)] = []
 
@@ -221,7 +221,7 @@ import Foundation
     let o = (operation == nil) ? empty : String(describing: operation!)
     let g = gates.map { $0.complement ? ("!" + $0.name) : $0.name }
     let lines = [
-      "BooleanGateEntity(",
+      "BooleanGateDescriptor(",
       "  name: \(name ?? empty)",
       "  parent: \(parent ?? empty)",
       "  operation: \(o)",
