@@ -1,11 +1,13 @@
 # FlowKit
 
-A library for analyzing flow cytometry data, written in Swift 3.
+[![Build Status](https://travis-ci.org/xwu/FlowKit.svg?branch=master)](https://travis-ci.org/xwu/FlowKit)
+
+A library for analyzing flow cytometry data, written in Swift.
 
 ## Requirements
 
-- macOS 10.11+
-- Xcode 8.0+
+- macOS 10.12.5+
+- Xcode 9.0+
 
 ## Installation
 
