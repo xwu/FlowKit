@@ -400,7 +400,9 @@ public final class Sample {
             else { return 1 << bitWidths[$0 - 1] }
           return range
         }
-        let bitmasks = ranges.map { 1 << UInt64(ceil(log2(Double($0)))) }
+        let bitmasks = ranges.map {
+          (1 as UInt64) << UInt64(ceil(log2(Double($0))))
+        }
 
         let isTransformEnabled = options.contains(.transform)
         let transforms = (1...par).map { i -> (Float, Float) in
