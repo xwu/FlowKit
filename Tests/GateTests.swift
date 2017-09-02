@@ -31,8 +31,8 @@ class GateTests: XCTestCase {
       distanceSquared: 1
     )
     XCTAssertEqual(g.rotation!, 0)
-    XCTAssertEqualWithAccuracy(g.halfAxes!.0, 200, accuracy: 0.001)
-    XCTAssertEqualWithAccuracy(g.halfAxes!.1, 175, accuracy: 0.001)
+    XCTAssertEqual(g.halfAxes!.0, 200, accuracy: 0.001)
+    XCTAssertEqual(g.halfAxes!.1, 175, accuracy: 0.001)
 
     let h = EllipsoidGate(
       dimensions: ["FSC-A", "SSC-A"],
@@ -40,7 +40,7 @@ class GateTests: XCTestCase {
       covariances: [1134.5, -234.5, -234.5, 1134.5],
       distanceSquared: 1
     )
-    XCTAssertEqualWithAccuracy(h.rotation!, -Float.pi / 4, accuracy: 0.000001)
+    XCTAssertEqual(h.rotation!, -Float.pi / 4, accuracy: 0.000001)
     XCTAssertEqual(h.halfAxes!.0, 37)
     XCTAssertEqual(h.halfAxes!.1, 30)
 
@@ -51,8 +51,8 @@ class GateTests: XCTestCase {
       distanceSquared: 0.2
     )
     XCTAssert(i.rotation!.isNaN)
-    XCTAssertEqualWithAccuracy(i.halfAxes!.0, 0.4472135955, accuracy: 0.000001)
-    XCTAssertEqualWithAccuracy(i.halfAxes!.0, i.halfAxes!.1, accuracy: 0.000001)
+    XCTAssertEqual(i.halfAxes!.0, 0.4472135955, accuracy: 0.000001)
+    XCTAssertEqual(i.halfAxes!.0, i.halfAxes!.1, accuracy: 0.000001)
   }
 
   func testRectangularGatePerformance() {

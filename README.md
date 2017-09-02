@@ -6,7 +6,7 @@ A library for analyzing flow cytometry data, written in Swift.
 
 ## Requirements
 
-- macOS 10.12.5+
+- macOS 10.12.6+
 - Xcode 9.0+
 
 ## Installation
