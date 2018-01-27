@@ -232,11 +232,19 @@ public final class Sample {
         in: (offset + begin)..<min(offset + end + 1, data.count)
       )
       guard let str = String(data: subdata, encoding: .utf8) else { return nil }
+#if swift(>=4.1)
+      guard let char = str.first else { return nil }
+      let dict = _parse(
+        keywords: String(str.dropFirst()), delimitedBy: char,
+        forbiddingEmptyValues: areEmptyValuesForbidden
+      )
+#else
       guard let char = str.characters.first as Character? else { return nil }
       let dict = _parse(
         keywords: String(str.characters.dropFirst()), delimitedBy: char,
         forbiddingEmptyValues: areEmptyValuesForbidden
       )
+#endif
       // Check for supplemental text
       if let b1 = dict["BEGINSTEXT"], let begin1 = Int(b1),
         begin1 != begin && begin1 != 0,

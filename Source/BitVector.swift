@@ -6,6 +6,7 @@
 //  Copyright © 2016 Xiaodi Wu. All rights reserved.
 //
 
+#if !swift(>=4.1)
 import Foundation
 
 internal struct _LeadingZerosLookupTable {
@@ -422,3 +423,5 @@ extension BitVector {
     return x
   }
 }
+#endif
+

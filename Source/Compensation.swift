@@ -96,7 +96,11 @@ public struct Compensation {
     let d = detectors.count
     let f = (fluorochromes ?? detectors).count
     let p = parameters.count
+#if swift(>=4.1)
+    let map = detectors.map { parameters.index(of: $0) }.compactMap { $0 }
+#else
     let map = detectors.map { parameters.index(of: $0) }.flatMap { $0 }
+#endif
     // We cannot proceed if any detector is not found among `parameters`
     guard d == map.count else { return nil }
 
