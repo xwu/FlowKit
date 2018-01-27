@@ -9,6 +9,7 @@
 import XCTest
 @testable import FlowKit
 
+#if !swift(>=4.1)
 class BitVectorTests: XCTestCase {
 /*
   override func setUp() {
@@ -100,3 +101,4 @@ class BitVectorTests: XCTestCase {
     }
   }
 }
+#endif
